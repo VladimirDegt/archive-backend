@@ -2,11 +2,19 @@ const { Schema, model } = require("mongoose");
 const handleMongooseError = require("../utils/handleMongooseError");
 
 const fileSchema = new Schema({
-  name: {
+  nameCustomer: {
     type:String,
     // required: true,
   },
-  file: {
+  numberDocument: {
+    type:String,
+    // required: true,
+  },
+  type_document: {
+    type:String,
+    // required: true,
+  },
+  fileURL: {
     type:String,
     // required: true,
   },

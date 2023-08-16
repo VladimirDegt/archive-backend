@@ -9,7 +9,8 @@ const fileDir = path.join(__dirname, "../", "public", "files");
 
 const add = async (req, res) => {
   const { id: owner } = req.user;
-  console.log('req.body', req.body);
+  const {type_document, nameCustomer, numberDocument} = req.body;
+
   const { path: tempUpload, originalname, size } = req.file;
 
   const maxSizeFile = 5 * 1024 * 1024;
@@ -34,7 +35,7 @@ const add = async (req, res) => {
     throw HttpError(401);
   }
 
-  const addFile = await File.create({file: fileURL, owner });
+  const addFile = await File.create({nameCustomer, type_document, numberDocument, fileURL, owner });
   if (addFile) {
     res.status(201).json(addFile);
     return;

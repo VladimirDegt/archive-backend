@@ -9,6 +9,6 @@ const router = express.Router();
 
 router
   .route("/")
-  .post(authenticate, upload.single("dogovor"), ctrl.add);
+  .post(authenticate, upload.single("fileURL"), ctrl.add);
 
   module.exports = router;
