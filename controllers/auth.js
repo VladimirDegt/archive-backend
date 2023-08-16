@@ -26,8 +26,8 @@ const register = async (req, res) => {
   if (newUser) {
     res.status(201).json({
       user: {
+        name: newUser.name,
         email: newUser.email,
-        subscription: newUser.subscription,
       },
     });
     return;
@@ -85,28 +85,12 @@ const logout = async (req, res) => {
   });
 };
 
-const updateFieldSubscription = async (req, res) => {
-  const { subscription } = req.body;
-  const { _id } = req.user;
-  const user = await User.findById(_id);
-  if (!user) {
-    throw HttpError(401);
-  }
-
-  const updateUser = await User.findByIdAndUpdate(_id, { subscription });
-  if (updateUser) {
-    const user = await User.findById(_id);
-    res.json(user);
-  }
-};
-
 const updateFieldAvatar = async (req, res) => {
   const { _id } = req.user;
   const { path: tempUpload, originalname, size } = req.file;
-
-  const maxSizeFile = 3 * 1024 * 1024;
+  const maxSizeFile = 5 * 1024 * 1024;
   if (size > maxSizeFile) {
-    throw HttpError(401, "File size exceeds the maximum limit (3MB).");
+    throw HttpError(401, "File size exceeds the maximum limit (5MB).");
   }
 
   const filename = `${_id}_${originalname}`;
@@ -142,6 +126,5 @@ module.exports = {
   login: ctrlWrapper(login),
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
-  updateFieldSubscription: ctrlWrapper(updateFieldSubscription),
   updateFieldAvatar: ctrlWrapper(updateFieldAvatar),
 };
