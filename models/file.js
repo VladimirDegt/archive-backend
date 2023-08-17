@@ -10,7 +10,7 @@ const fileSchema = new Schema({
     type:String,
     // required: true,
   },
-  type_document: {
+  typeDocument: {
     type:String,
     // required: true,
   },

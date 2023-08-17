@@ -7,9 +7,23 @@ const ctrlWrapper = require("../utils/ctrl-wrapper");
 
 const fileDir = path.join(__dirname, "../", "public", "files");
 
+const getAll = async (req, res) => {
+  const { _id: owner } = req.user;
+  const { page = 1, limit = 10, } = req.query;
+  const skip = (page - 1) * limit;
+  const getFiles = await File.find({ owner }, "-createdAt -updatedAt", {
+    skip,
+    limit,
+  }).populate("owner", "name");
+  if (getFiles) {
+    res.json(getFiles);
+  }
+  throw HttpError(404);
+};
+
 const add = async (req, res) => {
   const { id: owner } = req.user;
-  const {type_document, nameCustomer, numberDocument} = req.body;
+  const {typeDocument, nameCustomer, numberDocument} = req.body;
 
   const { path: tempUpload, originalname, size } = req.file;
 
@@ -35,7 +49,7 @@ const add = async (req, res) => {
     throw HttpError(401);
   }
 
-  const addFile = await File.create({nameCustomer, type_document, numberDocument, fileURL, owner });
+  const addFile = await File.create({nameCustomer, typeDocument, numberDocument, fileURL, owner });
   if (addFile) {
     res.status(201).json(addFile);
     return;
@@ -45,4 +59,5 @@ const add = async (req, res) => {
 
 module.exports = {
   add: ctrlWrapper(add),
+  getAll: ctrlWrapper(getAll),
 };
