@@ -8,10 +8,9 @@ const ctrlWrapper = require("../utils/ctrl-wrapper");
 const fileDir = path.join(__dirname, "../", "public", "files");
 
 const getAll = async (req, res) => {
-  const { _id: owner } = req.user;
   const { page = 1, limit = 10, } = req.query;
   const skip = (page - 1) * limit;
-  const getFiles = await File.find({ owner }, "-createdAt -updatedAt", {
+  const getFiles = await File.find({}, "-createdAt -updatedAt", {
     skip,
     limit,
   }).populate("owner", "name");
