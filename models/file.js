@@ -14,7 +14,11 @@ const fileSchema = new Schema({
     type:String,
     // required: true,
   },
-  fileURL: {
+  fileURLPDF: {
+    type:String,
+    // required: true,
+  },
+  fileURLZIP: {
     type:String,
     // required: true,
   },
