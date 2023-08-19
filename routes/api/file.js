@@ -9,7 +9,11 @@ const router = express.Router();
 
 router
   .route("/")
-  .post(authenticate, upload.fields([{name: "fileURL"}, {name: "fileURLZip"}]), ctrl.add)
+  .post(
+    authenticate,
+    upload.fields([{ name: "fileURL" }, { name: "fileURLZip" }]),
+    ctrl.add
+  )
   .get(authenticate, ctrl.getAll);
 
-  module.exports = router;
+module.exports = router;
