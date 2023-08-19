@@ -1,5 +1,4 @@
 const File = require("../models/file");
-const User = require("../models/user");
 
 const getAllFiles = async (skip, limit) => {
   const getFiles = await File.find({}, "-createdAt -updatedAt", {
