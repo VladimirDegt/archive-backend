@@ -12,7 +12,7 @@ const {
 const fileDir = path.join(__dirname, "../", "public", "files");
 
 const getAll = async (req, res) => {
-  const { page = 1, limit = 10 } = req.query;
+  const { page = 1, limit = 3 } = req.query;
   const skip = (page - 1) * limit;
   const getFiles = await getAllFiles(skip, limit);
 
