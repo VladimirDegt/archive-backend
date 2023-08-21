@@ -7,6 +7,7 @@ const {
   getAllFiles,
   addDogovir,
   addNewAct,
+  getCountDocument,
 } = require("../services/servise-file");
 
 const fileDir = path.join(__dirname, "../", "public", "files");
@@ -22,6 +23,15 @@ const getAll = async (req, res) => {
   }
   throw HttpError(404);
 };
+
+const getCount = async (req, res) => {
+  const result = await getCountDocument()
+  if (result) {
+    res.json(result)
+    return
+  }
+  throw HttpError(404);
+}
 
 const add = async (req, res) => {
   const { id: owner } = req.user;
@@ -86,4 +96,5 @@ const add = async (req, res) => {
 module.exports = {
   add: ctrlWrapper(add),
   getAll: ctrlWrapper(getAll),
+  getCount: ctrlWrapper(getCount),
 };

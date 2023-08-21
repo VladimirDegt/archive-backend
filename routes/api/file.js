@@ -16,4 +16,8 @@ router
   )
   .get(authenticate, ctrl.getAll);
 
+  router
+  .route("/document")
+  .get(authenticate, ctrl.getCount);
+
 module.exports = router;

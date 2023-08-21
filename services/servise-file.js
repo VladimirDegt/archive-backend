@@ -8,6 +8,19 @@ const getAllFiles = async (skip, limit) => {
   return getFiles;
 };
 
+const getCountDocument = async () => {
+  const result = await File.aggregate([
+    {
+      $group: {
+        _id: null,
+        count: { $sum: 1 }, 
+        numberDocumentValues: { $addToSet:{id: "$_id", numberDocument: "$numberDocument"} }, 
+      },
+    },
+  ])
+    return result[0];
+}
+
 const addDogovir = async (item) => {
   const add = await File.create(item);
   return add;
@@ -26,4 +39,5 @@ module.exports = {
   getAllFiles,
   addDogovir,
   addNewAct,
+  getCountDocument
 };
