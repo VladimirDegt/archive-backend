@@ -11,7 +11,7 @@ const {
   addNewAct,
   getCountDocument,
 } = require("../services/servise-file");
-const parseUkrDate = require("../utils/parse-ukr-date")
+const parseUkrDate = require("../utils/parse-ukr-date");
 
 const fileDir = path.join(__dirname, "../", "public", "files");
 
@@ -28,13 +28,13 @@ const getAll = async (req, res) => {
 };
 
 const getCount = async (req, res) => {
-  const result = await getCountDocument()
+  const result = await getCountDocument();
   if (result) {
-    res.json(result)
-    return
+    res.json(result);
+    return;
   }
   throw HttpError(404);
-}
+};
 
 const add = async (req, res) => {
   const { id: owner } = req.user;
@@ -96,55 +96,62 @@ const add = async (req, res) => {
   }
 };
 
-const parsePDF = async(req, res) => {
-  if(!req.file){
-    res.status(400).json("File not found")
+const parsePDF = async (req, res) => {
+  if (!req.file) {
+    res.status(400).json("File not found");
   }
 
-  fs.readFile(req.file.path, async(err, data)=> {
-    if(err) {
+  await fs.readFile(req.file.path, async (err, data) => {
+    if (err) {
       res.status(500).json("Error while reading file");
       return;
     }
 
-    pdfParse(data).then(function(parseData) {
-      const textPDF = parseData.text.trim().replace(/\n/g, "").split(' ');
-      const copytextPDF = [...textPDF];
+    pdfParse(data)
+      .then(function (parseData) {
+        const textPDF = parseData.text.trim();
 
-      const regex = /^OУ-\d{8}/;
-      const numberAct = copytextPDF.find(item => item.match(regex));
+        const regexNumber = /OУ-\d{8}/;
+        const matchNumber = textPDF.match(regexNumber);
+        if (matchNumber) {
+          const value = matchNumber[0];
+          console.log("numberAct-->", value);
+        } else {
+          console.log("Не удалось найти значение");
+        }
 
-      const index = copytextPDF.indexOf("від");
-      const dateArray = copytextPDF.splice(index+1, 3);
-      const date = parseUkrDate(dateArray.join(' '));
+        const regexTotal = /Разом:(\d+\s*\d*,\d+)/;
+        const match = textPDF.match(regexTotal);
+        if (match) {
+          const value = match[1].replace(/\s/g, "");
+          const numericTotal = parseFloat(value.replace(",", "."));
+          console.log("price-->", numericTotal);
+        } else {
+          console.log("Не удалось найти значение");
+        }
 
-      const strTotal = copytextPDF.find(item => item.includes('Разом'));
-      const indexStrTotal = strTotal[0].indexOf(":");
-      const partOneTotal = strTotal.slice(indexStrTotal-1);
-      const indexTwoTotal = copytextPDF.indexOf(strTotal);
-      const partTwoTotal = copytextPDF.splice(indexTwoTotal+1, 1)[0].slice(0, -1);
-      const fullTotal = partOneTotal+partTwoTotal;
-      const numericTotal = parseFloat(fullTotal.replace(',', '.'));
+        const regexDate = /\d+\s+[^\s]+\s+\d{4}/;
+        const matchDate = textPDF.match(regexDate);
+        if (matchDate) {
+          const value = matchDate[0];
+          const date = parseUkrDate(value);
+          console.log("date-->", date);
+          console.log("month-->", matchDate[0].split(" ")[1]);
+        } else {
+          console.log("Не удалось найти значение");
+        }
 
-      console.log("numberAct-->", numberAct); 
-      console.log("month-->", dateArray[1]);
-      console.log("date-->", date); 
-      console.log("price-->", numericTotal);
-
-      res.json("Parsing success");
-          
-  }).catch(function(error){
-    res.status(500).json("Error while parsing PDF");
-  })
-
-  })
-
-
+        res.json("Parsing success");
+      })
+      .catch(function (error) {
+        res.status(500).json("Error while parsing PDF");
+      });
+  });
 };
 
 module.exports = {
   add: ctrlWrapper(add),
   getAll: ctrlWrapper(getAll),
   getCount: ctrlWrapper(getCount),
-  parsePDF: ctrlWrapper(parsePDF)
+  parsePDF: ctrlWrapper(parsePDF),
 };
