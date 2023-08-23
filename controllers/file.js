@@ -1,4 +1,6 @@
 const path = require("path");
+const pdfParse = require("pdf-parse");
+const fs = require("fs");
 const User = require("../models/user");
 const HttpError = require("../utils/http-error");
 const ctrlWrapper = require("../utils/ctrl-wrapper");
@@ -9,6 +11,7 @@ const {
   addNewAct,
   getCountDocument,
 } = require("../services/servise-file");
+const parseUkrDate = require("../utils/parse-ukr-date")
 
 const fileDir = path.join(__dirname, "../", "public", "files");
 
@@ -93,8 +96,55 @@ const add = async (req, res) => {
   }
 };
 
+const parsePDF = async(req, res) => {
+  if(!req.file){
+    res.status(400).json("File not found")
+  }
+
+  fs.readFile(req.file.path, async(err, data)=> {
+    if(err) {
+      res.status(500).json("Error while reading file");
+      return;
+    }
+
+    pdfParse(data).then(function(parseData) {
+      const textPDF = parseData.text.trim().replace(/\n/g, "").split(' ');
+      const copytextPDF = [...textPDF];
+
+      const regex = /^OУ-\d{8}/;
+      const numberAct = copytextPDF.find(item => item.match(regex));
+
+      const index = copytextPDF.indexOf("від");
+      const dateArray = copytextPDF.splice(index+1, 3);
+      const date = parseUkrDate(dateArray.join(' '));
+
+      const strTotal = copytextPDF.find(item => item.includes('Разом'));
+      const indexStrTotal = strTotal[0].indexOf(":");
+      const partOneTotal = strTotal.slice(indexStrTotal-1);
+      const indexTwoTotal = copytextPDF.indexOf(strTotal);
+      const partTwoTotal = copytextPDF.splice(indexTwoTotal+1, 1)[0].slice(0, -1);
+      const fullTotal = partOneTotal+partTwoTotal;
+      const numericTotal = parseFloat(fullTotal.replace(',', '.'));
+
+      console.log("numberAct-->", numberAct); 
+      console.log("month-->", dateArray[1]);
+      console.log("date-->", date); 
+      console.log("price-->", numericTotal);
+
+      res.json("Parsing success");
+          
+  }).catch(function(error){
+    res.status(500).json("Error while parsing PDF");
+  })
+
+  })
+
+
+};
+
 module.exports = {
   add: ctrlWrapper(add),
   getAll: ctrlWrapper(getAll),
   getCount: ctrlWrapper(getCount),
+  parsePDF: ctrlWrapper(parsePDF)
 };

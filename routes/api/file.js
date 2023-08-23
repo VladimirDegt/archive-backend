@@ -16,8 +16,16 @@ router
   )
   .get(authenticate, ctrl.getAll);
 
-  router
+router
   .route("/document")
   .get(authenticate, ctrl.getCount);
+
+router
+  .route("/pdf")
+  .post(
+    authenticate,
+    upload.single("filePDF"),
+    ctrl.parsePDF
+  )
 
 module.exports = router;
