@@ -21,6 +21,10 @@ const fileSchema = new Schema(
         nameMonth: String,
         fileURLPDF: String,
         fileURLZIP: String,
+        numberAct: String,
+        price: String,
+        date: String,
+        month: String,
       },
     ],
     fileURLPDF: {
@@ -36,7 +40,7 @@ const fileSchema = new Schema(
       ref: "user",
     },
   },
-  { versionKey: false }
+  { versionKey: false, timestamps: true }
 );
 
 fileSchema.post("save", handleMongooseError);

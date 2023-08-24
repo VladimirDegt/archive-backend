@@ -1,7 +1,7 @@
 const File = require("../models/file");
 
 const getAllFiles = async (skip, limit) => {
-  const getFiles = await File.find({}, "-createdAt -updatedAt", {
+  const getFiles = await File.find({}, "-updatedAt", {
     skip,
     limit,
   }).populate("owner", "name");
