@@ -1,6 +1,7 @@
 const fs = require("fs");
 const pdfParse = require("pdf-parse");
 const parseUkrDate = require("./parse-ukr-date");
+const months = require("../db/months");
 
 const parsePDF = (tempUploadPDF) => {
   return new Promise((resolve, reject) => {
@@ -37,15 +38,16 @@ const parsePDF = (tempUploadPDF) => {
       console.log("Не удалось найти значение");
     }
 
-    const regexDate = /\d+\s+[^\s]+\s+\d{4}/;
+    const regexDate = /від (\d+\s+[^\s]+\s+\d{4})/;
     const matchDate = textPDF.match(regexDate);
     if (matchDate) {
-      const value = matchDate[0];
+      const value = matchDate[1];
       const month= value.split(" ")[1]
       afterParsePDF['date'] = value;
-      afterParsePDF['month'] = month;
+      const updateMonth = months[month]
+      afterParsePDF['month'] = updateMonth;
       console.log("date-->", value);
-      console.log("month-->", month);
+      console.log("month-->", updateMonth);
     } else {
       console.log("Не удалось найти значение");
     }

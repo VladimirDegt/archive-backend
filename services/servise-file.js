@@ -4,7 +4,9 @@ const getAllFiles = async (skip, limit) => {
   const getFiles = await File.find({}, "-updatedAt", {
     skip,
     limit,
-  }).populate("owner", "name");
+  })
+  .sort({ numberDocument: 1 })
+  .populate("owner", "name");
   return getFiles;
 };
 

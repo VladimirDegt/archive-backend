@@ -5,15 +5,12 @@ const fileSchema = new Schema(
   {
     nameCustomer: {
       type: String,
-      // required: true,
     },
     numberDocument: {
       type: String,
-      // required: true,
     },
     typeDocument: {
       type: String,
-      // required: true,
     },
     acts: [
       {
@@ -29,11 +26,9 @@ const fileSchema = new Schema(
     ],
     fileURLPDF: {
       type: String,
-      // required: true,
     },
     fileURLZIP: {
       type: String,
-      // required: true,
     },
     owner: {
       type: Schema.Types.ObjectId,

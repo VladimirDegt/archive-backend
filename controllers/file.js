@@ -39,14 +39,8 @@ const add = async (req, res) => {
   const { typeDocument, nameCustomer, numberDocument, nameMonth, idDogovir } =
     req.body;
 
-  const {
-    path: tempUploadPDF,
-    size: sizePDF,
-  } = req.files.fileURL[0];
-  const {
-    path: tempUploadZIP,
-    size: sizeZIP,
-  } = req.files.fileURLZip[0];
+  const { path: tempUploadPDF, size: sizePDF } = req.files.fileURL[0];
+  const { path: tempUploadZIP, size: sizeZIP } = req.files.fileURLZip[0];
 
   const fileURLPDF = await renameFile(tempUploadPDF, sizePDF);
   const fileURLZIP = await renameFile(tempUploadZIP, sizeZIP);
@@ -66,7 +60,7 @@ const add = async (req, res) => {
   }
 
   if (idDogovir) {
-    const afterParsePDF = await parsePDF(tempUploadPDF)
+    const afterParsePDF = await parsePDF(tempUploadPDF);
     const newAct = {
       ...afterParsePDF,
       typeDocument,
@@ -97,62 +91,8 @@ const add = async (req, res) => {
   }
 };
 
-// const parsePDF = async (req, res) => {
-//   if (!req.file) {
-//     res.status(400).json("File not found");
-//   }
-
-//   await fs.readFile(req.file.path, async (err, data) => {
-//     if (err) {
-//       res.status(500).json("Error while reading file");
-//       return;
-//     }
-
-//     pdfParse(data)
-//       .then(function (parseData) {
-//         const textPDF = parseData.text.trim();
-
-//         const regexNumber = /OУ-\d{8}/;
-//         const matchNumber = textPDF.match(regexNumber);
-//         if (matchNumber) {
-//           const value = matchNumber[0];
-//           console.log("numberAct-->", value);
-//         } else {
-//           console.log("Не удалось найти значение");
-//         }
-
-//         const regexTotal = /Разом:(\d+\s*\d*,\d+)/;
-//         const match = textPDF.match(regexTotal);
-//         if (match) {
-//           const value = match[1].replace(/\s/g, "");
-//           const numericTotal = parseFloat(value.replace(",", "."));
-//           console.log("price-->", numericTotal);
-//         } else {
-//           console.log("Не удалось найти значение");
-//         }
-
-//         const regexDate = /\d+\s+[^\s]+\s+\d{4}/;
-//         const matchDate = textPDF.match(regexDate);
-//         if (matchDate) {
-//           const value = matchDate[0];
-//           const date = parseUkrDate(value);
-//           console.log("date-->", date);
-//           console.log("month-->", matchDate[0].split(" ")[1]);
-//         } else {
-//           console.log("Не удалось найти значение");
-//         }
-
-//         res.json("Parsing success");
-//       })
-//       .catch(function (error) {
-//         res.status(500).json("Error while parsing PDF");
-//       });
-//   });
-// };
-
 module.exports = {
   add: ctrlWrapper(add),
   getAll: ctrlWrapper(getAll),
   getCount: ctrlWrapper(getCount),
-  // parsePDF: ctrlWrapper(parsePDF),
 };
