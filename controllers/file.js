@@ -8,10 +8,11 @@ const {
   addDogovir,
   addNewAct,
   getCountDocument,
+  search,
 } = require("../services/servise-file");
 const parsePDF = require("../utils/parse-pdf");
-
-const fileDir = path.join(__dirname, "../", "public", "files");
+// =============== для локального зберігання ===============================================
+// const fileDir = path.join(__dirname, "../", "public", "files");
 
 const getAll = async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
@@ -91,8 +92,17 @@ const add = async (req, res) => {
   }
 };
 
+const searchDocument = async (req, res) => {
+  const getField = await search(req.body);
+  if (getField) {
+    res.json(getField);
+  }
+  throw HttpError(404);
+};
+
 module.exports = {
   add: ctrlWrapper(add),
   getAll: ctrlWrapper(getAll),
   getCount: ctrlWrapper(getCount),
+  searchDocument: ctrlWrapper(searchDocument),
 };

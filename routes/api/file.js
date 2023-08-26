@@ -16,8 +16,8 @@ router
   )
   .get(authenticate, ctrl.getAll);
 
-router
-  .route("/document")
-  .get(authenticate, ctrl.getCount);
+router.route("/document").get(authenticate, ctrl.getCount);
+
+router.route("/search").post(authenticate, ctrl.searchDocument);
 
 module.exports = router;

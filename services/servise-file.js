@@ -5,8 +5,8 @@ const getAllFiles = async (skip, limit) => {
     skip,
     limit,
   })
-  .sort({ numberDocument: 1 })
-  .populate("owner", "name");
+    .sort({ numberDocument: 1 })
+    .populate("owner", "name");
   return getFiles;
 };
 
@@ -15,13 +15,15 @@ const getCountDocument = async () => {
     {
       $group: {
         _id: null,
-        count: { $sum: 1 }, 
-        numberDocumentValues: { $addToSet:{id: "$_id", numberDocument: "$numberDocument"} }, 
+        count: { $sum: 1 },
+        numberDocumentValues: {
+          $addToSet: { id: "$_id", numberDocument: "$numberDocument" },
+        },
       },
     },
-  ])
-    return result[0];
-}
+  ]);
+  return result[0];
+};
 
 const addDogovir = async (item) => {
   const add = await File.create(item);
@@ -37,9 +39,27 @@ const addNewAct = async (id, newAct) => {
   return updateActs;
 };
 
+const search = async ({ nameCustomer, numberDocument }) => {
+  if (nameCustomer) {
+    const getName = await File.findOne({ nameCustomer }, "-updatedAt").populate(
+      "owner",
+      "name"
+    );
+    return getName;
+  }
+  if (numberDocument) {
+    const getNumber = await File.findOne(
+      { numberDocument },
+      "-updatedAt"
+    ).populate("owner", "name");
+    return getNumber;
+  }
+};
+
 module.exports = {
   getAllFiles,
   addDogovir,
   addNewAct,
-  getCountDocument
+  getCountDocument,
+  search,
 };
