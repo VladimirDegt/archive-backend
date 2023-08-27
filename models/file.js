@@ -7,7 +7,7 @@ const fileSchema = new Schema(
       type: String,
     },
     numberDocument: {
-      type: String,
+      type: Number,
     },
     typeDocument: {
       type: String,

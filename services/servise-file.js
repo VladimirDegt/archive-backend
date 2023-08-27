@@ -1,11 +1,10 @@
 const File = require("../models/file");
 
-const getAllFiles = async (skip, limit) => {
-  const getFiles = await File.find({}, "-updatedAt", {
-    skip,
-    limit,
-  })
-    .sort({ numberDocument: 1 })
+const getAllFiles = async (sort, skip, limit) => {
+  const getFiles = await File.find()
+    .sort(sort)
+    .skip(skip)
+    .limit(limit)
     .populate("owner", "name");
   return getFiles;
 };

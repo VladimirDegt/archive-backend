@@ -17,7 +17,7 @@ const parsePDF = require("../utils/parse-pdf");
 const getAll = async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
   const skip = (page - 1) * limit;
-  const getFiles = await getAllFiles(skip, limit);
+  const getFiles = await getAllFiles({ numberDocument: 1 }, skip, limit);
 
   if (getFiles) {
     res.json(getFiles);
