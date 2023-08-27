@@ -37,8 +37,7 @@ const getCount = async (req, res) => {
 
 const add = async (req, res) => {
   const { id: owner } = req.user;
-  const { typeDocument, nameCustomer, numberDocument, nameMonth, idDogovir } =
-    req.body;
+  const { typeDocument, nameCustomer, numberDocument, idDogovir } = req.body;
 
   const { path: tempUploadPDF, size: sizePDF } = req.files.fileURL[0];
   const { path: tempUploadZIP, size: sizeZIP } = req.files.fileURLZip[0];
