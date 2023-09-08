@@ -1,6 +1,5 @@
 const fs = require("fs");
 const pdfParse = require("pdf-parse");
-const parseUkrDate = require("./parse-ukr-date");
 const months = require("../db/months");
 
 const parsePDF = (tempUploadPDF) => {
@@ -24,7 +23,7 @@ const parsePDF = (tempUploadPDF) => {
       afterParsePDF['numberAct'] = value;
       console.log("numberAct-->", value);
     } else {
-      console.log("Не удалось найти значение");
+      throw HttpError(400);
     }
 
     const regexTotal = /Разом:(\d+\s*\d*,\d+)/;
@@ -35,7 +34,7 @@ const parsePDF = (tempUploadPDF) => {
       afterParsePDF['price'] = numericTotal;
       console.log("price-->", numericTotal);
     } else {
-      console.log("Не удалось найти значение");
+      throw HttpError(400);
     }
 
     const regexDate = /від (\d+\s+[^\s]+\s+\d{4})/;
@@ -46,13 +45,10 @@ const parsePDF = (tempUploadPDF) => {
       afterParsePDF['date'] = value;
       const updateMonth = months[month]
       afterParsePDF['month'] = updateMonth;
-      console.log("date-->", value);
-      console.log("month-->", updateMonth);
     } else {
-      console.log("Не удалось найти значение");
+      throw HttpError(400);
     }
 
-    console.log("afterParsePDF", afterParsePDF);
     resolve(afterParsePDF)
 
   })

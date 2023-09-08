@@ -11,6 +11,7 @@ const {
   search,
 } = require("../services/servise-file");
 const parsePDF = require("../utils/parse-pdf");
+const parseDogovir = require("../utils/parse-dogovir");
 // =============== для локального зберігання ===============================================
 // const fileDir = path.join(__dirname, "../", "public", "files");
 
@@ -37,7 +38,7 @@ const getCount = async (req, res) => {
 
 const add = async (req, res) => {
   const { id: owner } = req.user;
-  const { typeDocument, nameCustomer, numberDocument, idDogovir } = req.body;
+  const { typeDocument, idDogovir } = req.body;
 
   const { path: tempUploadPDF, size: sizePDF } = req.files.fileURL[0];
   const { path: tempUploadZIP, size: sizeZIP } = req.files.fileURLZip[0];
@@ -59,36 +60,46 @@ const add = async (req, res) => {
     throw HttpError(401);
   }
 
-  if (idDogovir) {
-    const afterParsePDF = await parsePDF(tempUploadPDF);
-    const newAct = {
-      ...afterParsePDF,
-      typeDocument,
-      fileURLPDF,
-      fileURLZIP,
-    };
-    console.log("newAct-->", newAct);
-
-    const updateActs = await addNewAct(idDogovir, newAct);
-    if (updateActs) {
-      res.json(updateActs);
-      return;
+  if (typeDocument === "Договір") {
+    try {
+      const afterParseDogovir = await parseDogovir(tempUploadPDF)
+      const addDocument = addDogovir({
+        ...afterParseDogovir,
+        typeDocument,
+        fileURLPDF,
+        fileURLZIP,
+        owner,
+      });
+    
+      if (addDocument) {
+        res.status(201).json(addDocument);
+        return;
+      }
+    } catch (error) {
+      res.status(400).json({message: "Помилка при обробці договору"})
     }
-    throw HttpError(404);
   }
 
-  const addDocument = addDogovir({
-    nameCustomer,
-    typeDocument,
-    numberDocument,
-    fileURLPDF,
-    fileURLZIP,
-    owner,
-  });
-
-  if (addDocument) {
-    res.status(201).json(addDocument);
+  if (typeDocument === "Акт наданих послуг") {
+    try {
+      const afterParsePDF = await parsePDF(tempUploadPDF);
+      const newAct = {
+        ...afterParsePDF,
+        typeDocument,
+        fileURLPDF,
+        fileURLZIP,
+      };
+  
+      const updateActs = await addNewAct(idDogovir, newAct);
+      if (updateActs) {
+        res.json(updateActs);
+        return;
+      }
+    } catch (error) {
+      res.status(400).json({message: "Помилка при обробці акта"})
+    }
   }
+
 };
 
 const searchDocument = async (req, res) => {
