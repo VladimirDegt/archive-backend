@@ -20,4 +20,6 @@ router.route("/document").get(authenticate, ctrl.getCount);
 
 router.route("/search").post(authenticate, ctrl.searchDocument);
 
+router.route("/:id").get(authenticate, ctrl.vchasno);
+
 module.exports = router;

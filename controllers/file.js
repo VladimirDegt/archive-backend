@@ -12,6 +12,10 @@ const {
 } = require("../services/servise-file");
 const parsePDF = require("../utils/parse-pdf");
 const parseDogovir = require("../utils/parse-dogovir");
+const getDocument = require("../utils/axios");
+
+const fs = require("fs/promises");
+
 // =============== для локального зберігання ===============================================
 // const fileDir = path.join(__dirname, "../", "public", "files");
 
@@ -62,7 +66,7 @@ const add = async (req, res) => {
 
   if (typeDocument === "Договір") {
     try {
-      const afterParseDogovir = await parseDogovir(tempUploadPDF)
+      const afterParseDogovir = await parseDogovir(tempUploadPDF);
       const addDocument = addDogovir({
         ...afterParseDogovir,
         typeDocument,
@@ -70,13 +74,13 @@ const add = async (req, res) => {
         fileURLZIP,
         owner,
       });
-    
+
       if (addDocument) {
         res.status(201).json(addDocument);
         return;
       }
     } catch (error) {
-      res.status(400).json({message: "Помилка при обробці договору"})
+      res.status(400).json({ message: "Помилка при обробці договору" });
     }
   }
 
@@ -89,17 +93,16 @@ const add = async (req, res) => {
         fileURLPDF,
         fileURLZIP,
       };
-  
+
       const updateActs = await addNewAct(idDogovir, newAct);
       if (updateActs) {
         res.json(updateActs);
         return;
       }
     } catch (error) {
-      res.status(400).json({message: "Помилка при обробці акта"})
+      res.status(400).json({ message: "Помилка при обробці акта" });
     }
   }
-
 };
 
 const searchDocument = async (req, res) => {
@@ -110,9 +113,17 @@ const searchDocument = async (req, res) => {
   throw HttpError(404);
 };
 
+const vchasno = async (req, res) => {
+  const { id } = req.params;
+  const result = await getDocument();
+
+  res.json(result);
+};
+
 module.exports = {
   add: ctrlWrapper(add),
   getAll: ctrlWrapper(getAll),
   getCount: ctrlWrapper(getCount),
   searchDocument: ctrlWrapper(searchDocument),
+  vchasno: ctrlWrapper(vchasno),
 };
