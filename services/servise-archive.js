@@ -1,11 +1,14 @@
 const Archive = require("../models/archive");
 const HttpError = require("../utils/http-error");
+const uploadFileFromVchasno = require("../utils/write-files-db_archive");
 
 const writeDocumentToArchive = async ({ data }) => {
-  const updateArrayDocuments = data.map((document) => {
+  const updateArrayDocuments = data.map(async (document) => {
     const tempFullDocument = {};
     const parts = document["Посилання на документ"].split("/");
     const documentId = parts[parts.length - 1];
+    const urlFiles = await uploadFileFromVchasno(documentId);
+    console.log("urlFiles-->", urlFiles);
     tempFullDocument.idDocument = documentId;
     tempFullDocument.dateCreate = document["Дата завантаження"];
     tempFullDocument.nameDocument = document["Назва документа"];
@@ -14,8 +17,8 @@ const writeDocumentToArchive = async ({ data }) => {
     tempFullDocument.emailCustomer = document["Email контрагента"];
     tempFullDocument.nameCustomer = document["Назва компанії контрагента"];
     tempFullDocument.codeCustomer = document["ЄДРПОУ/ІПН контрагента"];
-    tempFullDocument.fileURLPDF = "";
-    tempFullDocument.fileURLZIP = "";
+    tempFullDocument.fileURLPDF = urlFiles.urlPdf;
+    tempFullDocument.fileURLZIP = urlFiles.urlZip;
     return tempFullDocument;
   });
 
@@ -34,6 +37,4 @@ const writeDocumentToArchive = async ({ data }) => {
   }
 };
 
-module.exports = {
-  writeDocumentToArchive,
-};
+module.exports = writeDocumentToArchive;

@@ -16,7 +16,7 @@ const {
 const parsePDF = require("../utils/parse-pdf");
 const parseDogovir = require("../utils/parse-dogovir");
 const getDocumentFromVchasno = require("../utils/get-document-from-Vchasno");
-const { writeDocumentToArchive } = require("../services/servise-archive");
+const writeDocumentToArchive = require("../services/servise-archive");
 
 // =============== для локального зберігання ===============================================
 // const fileDir = path.join(__dirname, "../", "public", "files");
@@ -118,12 +118,14 @@ const searchDocument = async (req, res) => {
 const uploadFileFromVchasno = async (req, res) => {
   const { id } = req.params;
   const publicDir = path.join(__dirname, "../", "public", "files");
+  const urlFiles = {};
+
+  let typeDocument = "pdf/print";
   let fileName = `${uuidv4()}.pdf`;
   let resultUpload = path.join(publicDir, fileName);
-  let typeDocument = "pdf/print";
-
   try {
     await getDocumentFromVchasno(id, typeDocument, resultUpload);
+    urlFiles.urlPdf = resultUpload;
   } catch (error) {
     res.status(500).json({ message: "Помилка при отриманні файлу з Вчасно" });
   }
@@ -133,10 +135,11 @@ const uploadFileFromVchasno = async (req, res) => {
   resultUpload = path.join(publicDir, fileName);
   try {
     await getDocumentFromVchasno(id, typeDocument, resultUpload);
+    urlFiles.urlZip = resultUpload;
   } catch (error) {
     res.status(500).json({ message: "Помилка при отриманні файлу з Вчасно" });
   }
-
+  console.log("urlFiles-->", urlFiles);
   res.json({ message: "Файли завантажені" });
 };
 

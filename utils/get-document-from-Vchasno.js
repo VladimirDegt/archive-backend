@@ -5,8 +5,6 @@ const HttpError = require("./http-error");
 const getDocumentFromVchasno = async (id, typeDocument, resultUpload) => {
   const fileUrl = `https://edo.vchasno.ua/api/v2/documents/${id}/${typeDocument}`;
 
-  console.log(fileUrl);
-
   const headers = {
     Authorization: "PAuyukh9lEZ0cKr5b4I8t7DU2QRa2Y5hSm-x",
     "Content-Type": "application/json",
@@ -30,8 +28,6 @@ const getDocumentFromVchasno = async (id, typeDocument, resultUpload) => {
       fileStream.on("finish", () => {
         fileStream.close();
       });
-
-      return resultUpload;
     })
     .on("error", (err) => {
       console.error("Помилка при запиті на получення файлу:", err);
