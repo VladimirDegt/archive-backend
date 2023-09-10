@@ -2,8 +2,11 @@ const https = require("https");
 const fs = require("fs");
 const HttpError = require("./http-error");
 
-const getDocumentFromVchasno = async (id, typeDocument, filePath) => {
+const getDocumentFromVchasno = async (id, typeDocument, resultUpload) => {
   const fileUrl = `https://edo.vchasno.ua/api/v2/documents/${id}/${typeDocument}`;
+
+  console.log(fileUrl);
+
   const headers = {
     Authorization: "PAuyukh9lEZ0cKr5b4I8t7DU2QRa2Y5hSm-x",
     "Content-Type": "application/json",
@@ -17,25 +20,21 @@ const getDocumentFromVchasno = async (id, typeDocument, filePath) => {
   await https
     .get(fileUrl, options, (response) => {
       if (response.statusCode !== 200) {
-        console.error("Ошибка при получении файла:", response.statusCode);
+        console.error("Помилка при отраманні файлу: ", response.statusCode);
         throw HttpError(400);
       }
+      const fileStream = fs.createWriteStream(resultUpload);
 
-      if (typeDocument === "pdf/print") {
-        const fileStream = fs.createWriteStream(filePath);
+      response.pipe(fileStream);
 
-        response.pipe(fileStream);
+      fileStream.on("finish", () => {
+        fileStream.close();
+      });
 
-        fileStream.on("finish", () => {
-          console.log("Файл успішно збережено");
-          fileStream.close();
-        });
-
-        return filePath;
-      }
+      return resultUpload;
     })
     .on("error", (err) => {
-      console.error("Ошибка при запиті на получення файлу:", err);
+      console.error("Помилка при запиті на получення файлу:", err);
       throw HttpError(500);
     });
 };

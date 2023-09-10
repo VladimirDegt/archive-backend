@@ -16,7 +16,6 @@ const {
 const parsePDF = require("../utils/parse-pdf");
 const parseDogovir = require("../utils/parse-dogovir");
 const getDocumentFromVchasno = require("../utils/get-document-from-Vchasno");
-const relocateLoadFile = require("../utils/relocateLoadFile");
 const { writeDocumentToArchive } = require("../services/servise-archive");
 
 // =============== для локального зберігання ===============================================
@@ -118,26 +117,27 @@ const searchDocument = async (req, res) => {
 
 const uploadFileFromVchasno = async (req, res) => {
   const { id } = req.params;
-  const fileName = `${uuidv4()}.pdf`;
-  const tempDir = path.join(__dirname, "../", "temp");
   const publicDir = path.join(__dirname, "../", "public", "files");
-  const filePath = path.join(tempDir, fileName);
-  const resultUpload = path.join(publicDir, fileName);
-  const typeDocument = "pdf/print";
+  let fileName = `${uuidv4()}.pdf`;
+  let resultUpload = path.join(publicDir, fileName);
+  let typeDocument = "pdf/print";
 
   try {
-    await getDocumentFromVchasno(id, typeDocument, filePath);
-    res.json({ message: "файл збережено" });
+    await getDocumentFromVchasno(id, typeDocument, resultUpload);
   } catch (error) {
     res.status(500).json({ message: "Помилка при отриманні файлу з Вчасно" });
   }
 
+  typeDocument = "archive";
+  fileName = `${uuidv4()}.zip`;
+  resultUpload = path.join(publicDir, fileName);
   try {
-    await relocateLoadFile(filePath, resultUpload);
-    console.log("Файл успішно переміщено до папки Public");
+    await getDocumentFromVchasno(id, typeDocument, resultUpload);
   } catch (error) {
-    console.log("Помилка при переміщенні файлу: ", error.message);
+    res.status(500).json({ message: "Помилка при отриманні файлу з Вчасно" });
   }
+
+  res.json({ message: "Файли завантажені" });
 };
 
 const parseFileCSV = async (req, res) => {
