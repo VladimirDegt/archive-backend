@@ -20,6 +20,10 @@ router.route("/document").get(authenticate, ctrl.getCount);
 
 router.route("/search").post(authenticate, ctrl.searchDocument);
 
-router.route("/:id").get(authenticate, ctrl.vchasno);
+router.route("/:id").get(authenticate, ctrl.uploadFileFromVchasno);
+
+router
+  .route("/csv")
+  .post(authenticate, upload.single("csv"), ctrl.parseFileCSV);
 
 module.exports = router;
