@@ -1,14 +1,26 @@
 const Archive = require("../models/archive");
 const HttpError = require("../utils/http-error");
-const uploadFileFromVchasno = require("../utils/write-files-db_archive");
 
-const writeDocumentToArchive = async ({ data }) => {
-  const updateArrayDocuments = data.map(async (document) => {
+const findIdDocument = async (id) => {
+  const find = await Archive.findOne({idDocument: id })
+  return find;
+}
+
+const getAllFiles = async (sort) => {
+  const getFiles = await Archive.find()
+    .sort(sort)
+    .populate("owner", "name");
+  return getFiles;
+};
+
+const writeDocumentToArchive = async ({ data }, owner) => {
+  const updateArrayDocuments = data.map((document) => {
     const tempFullDocument = {};
+    if(!document["Посилання на документ"]){
+      return null;
+    }
     const parts = document["Посилання на документ"].split("/");
     const documentId = parts[parts.length - 1];
-    const urlFiles = await uploadFileFromVchasno(documentId);
-    console.log("urlFiles-->", urlFiles);
     tempFullDocument.idDocument = documentId;
     tempFullDocument.dateCreate = document["Дата завантаження"];
     tempFullDocument.nameDocument = document["Назва документа"];
@@ -17,24 +29,50 @@ const writeDocumentToArchive = async ({ data }) => {
     tempFullDocument.emailCustomer = document["Email контрагента"];
     tempFullDocument.nameCustomer = document["Назва компанії контрагента"];
     tempFullDocument.codeCustomer = document["ЄДРПОУ/ІПН контрагента"];
-    tempFullDocument.fileURLPDF = urlFiles.urlPdf;
-    tempFullDocument.fileURLZIP = urlFiles.urlZip;
+    tempFullDocument.fileURLPDF = '';
+    tempFullDocument.fileURLZIP = '';
+    tempFullDocument.owner = owner;
     return tempFullDocument;
   });
-
+  
   for (const document of updateArrayDocuments) {
+    if(!document){
+      continue
+    }
+    const findID = await findIdDocument(document.idDocument);
+    if(findID) {
+      continue
+    }
     try {
       await Archive.create(document);
       console.log(
-        `Запись успешно создана для документа с ID ${document.idDocument}`
+        `Успішно створено запис для документу з ID ${document.idDocument}`
       );
     } catch (error) {
       console.error(
-        `Ошибка при создании записи для документа с ID ${document.idDocument}: ${error.message}`
+        `Помилка при створені запису для документу з ID ${document.idDocument}: ${error.message}`
       );
       throw HttpError(400);
     }
   }
 };
 
-module.exports = writeDocumentToArchive;
+const addFileURLToDB = async (id, urls) => {
+  const updateFileURL = await Archive.findOneAndUpdate(
+    {idDocument: id},
+    { $set: { fileURLPDF: urls.urlPdf, fileURLZIP: urls.urlZip } },
+    { new: true }
+  );
+
+  if (!updateFileURL) {
+    throw HttpError(400);
+  }
+
+  return updateFileURL;
+};
+
+module.exports = {
+  writeDocumentToArchive,
+  getAllFiles,
+  addFileURLToDB
+};

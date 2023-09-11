@@ -16,7 +16,7 @@ const {
 const parsePDF = require("../utils/parse-pdf");
 const parseDogovir = require("../utils/parse-dogovir");
 const getDocumentFromVchasno = require("../utils/get-document-from-Vchasno");
-const writeDocumentToArchive = require("../services/servise-archive");
+const {writeDocumentToArchive, addFileURLToDB} = require("../services/servise-archive");
 
 // =============== для локального зберігання ===============================================
 // const fileDir = path.join(__dirname, "../", "public", "files");
@@ -140,14 +140,26 @@ const uploadFileFromVchasno = async (req, res) => {
     res.status(500).json({ message: "Помилка при отриманні файлу з Вчасно" });
   }
   console.log("urlFiles-->", urlFiles);
-  res.json({ message: "Файли завантажені" });
+  try {
+    await addFileURLToDB(id, urlFiles);
+    res.json({ message: "Url файлів додано до БД" });
+  } catch (error) {
+    res.status(500).json({ message: "Помилка при запису url файлу до БД" });
+  }
+  
 };
 
 const parseFileCSV = async (req, res) => {
+  const { id: owner } = req.user;
   const { path: tempUpload, size } = req.file;
   const maxSizeFile = 5 * 1024 * 1024;
   if (size > maxSizeFile) {
     throw HttpError(401, "File size exceeds the maximum limit (5MB).");
+  }
+
+  const user = await User.findById(owner);
+  if (!user) {
+    throw HttpError(401);
   }
 
   fs.readFile(tempUpload, "utf8", async (err, data) => {
@@ -162,7 +174,7 @@ const parseFileCSV = async (req, res) => {
         dynamicTyping: true,
       });
 
-      await writeDocumentToArchive(parse);
+      await writeDocumentToArchive(parse, owner);
 
       res.json({ message: parse });
     } catch (error) {
@@ -170,7 +182,6 @@ const parseFileCSV = async (req, res) => {
     } finally {
       fs.unlink(tempUpload, (err) => {
         if (err) throw err;
-        console.log(".csv файл видалено");
       });
     }
   });
