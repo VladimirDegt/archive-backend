@@ -6,9 +6,11 @@ const findIdDocument = async (id) => {
   return find;
 }
 
-const getAllFiles = async (sort) => {
+const getAllFiles = async (sort, skip, limit) => {
   const getFiles = await Archive.find()
     .sort(sort)
+    .skip(skip)
+    .limit(limit)
     .populate("owner", "name");
   return getFiles;
 };
@@ -71,8 +73,14 @@ const addFileURLToDB = async (id, urls) => {
   return updateFileURL;
 };
 
+const totalDocument = async() => {
+  const total = await Archive.find()
+  return total.length
+}
+
 module.exports = {
   writeDocumentToArchive,
   getAllFiles,
-  addFileURLToDB
+  addFileURLToDB,
+  totalDocument,
 };
