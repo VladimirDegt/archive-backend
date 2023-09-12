@@ -139,7 +139,6 @@ const uploadFileFromVchasno = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Помилка при отриманні файлу з Вчасно" });
   }
-  console.log("urlFiles-->", urlFiles);
   try {
     await addFileURLToDB(id, urlFiles);
     res.json({ message: "Url файлів додано до БД" });

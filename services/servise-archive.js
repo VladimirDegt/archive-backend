@@ -21,6 +21,9 @@ const writeDocumentToArchive = async ({ data }, owner) => {
     if(!document["Посилання на документ"]){
       return null;
     }
+    if(document["Статус підписання"] !== 'Підписаний всіма'){
+      return null;
+    }
     const parts = document["Посилання на документ"].split("/");
     const documentId = parts[parts.length - 1];
     tempFullDocument.idDocument = documentId;
