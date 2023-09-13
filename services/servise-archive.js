@@ -7,6 +7,11 @@ const findIdDocument = async (id) => {
   return find;
 }
 
+const findDocumentOneCustomer = async (name) => {
+  const find = await Archive.find({nameCustomer: name})
+  return find;
+}
+
 const getAllFiles = async (sort, skip, limit) => {
   const getFiles = await Archive.find()
     .sort(sort)
@@ -91,4 +96,5 @@ module.exports = {
   getAllFiles,
   addFileURLToDB,
   totalDocument,
+  findDocumentOneCustomer,
 };

@@ -175,7 +175,7 @@ const parseFileCSV = async (req, res) => {
 
       await writeDocumentToArchive(parse, owner);
 
-      res.json({ message: parse });
+      res.json({ message: "Дані файлу .csv успішно додано до БД" });
     } catch (error) {
       res.status(500).json({ message: "Помилка парсингу файлу .csv" });
     } finally {

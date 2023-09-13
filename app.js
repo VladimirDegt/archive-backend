@@ -5,6 +5,7 @@ const cors = require("cors");
 const authRouter = require("./routes/api/auth");
 const filesRouter = require("./routes/api/file");
 const archiveRouter = require("./routes/api/archive");
+const multiDataStoreRouter = require("./routes/api/multi-data-store");
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(express.static("public"));
 app.use("/users", authRouter);
 app.use("/api/file", filesRouter);
 app.use("/api/archive", archiveRouter);
+app.use("/api/multiDataStore", multiDataStoreRouter);
 
 app.use((_, res) => {
   res.status(404).json({ message: "Not found" });

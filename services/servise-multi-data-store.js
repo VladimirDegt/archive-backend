@@ -21,6 +21,17 @@ const addNameCustomerToDB = async (nameCustomer) => {
   }
 };
 
+const getNameCustomerToDB = async () => {
+  try {
+    const getNames = await MultiDataStore.findOne({customer: {$exists: true}})
+    console.log('Назви замовників успішно знайдено');
+    return getNames.customer;
+  } catch (error) {
+    console.log('Помилка узяти всіх замовників: ', error.message);
+  }
+}
+
 module.exports = {
   addNameCustomerToDB,
+  getNameCustomerToDB
 };
