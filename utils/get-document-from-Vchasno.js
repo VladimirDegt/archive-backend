@@ -34,6 +34,7 @@ const getDocumentFromVchasno = async (id, typeDocument, resultUpload) => {
     .on("error", (err) => {
       console.error("Помилка при запиті на получення файлу:", err);
       throw HttpError(500);
+      response.close();
     });
 };
 

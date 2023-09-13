@@ -145,7 +145,7 @@ const uploadFileFromVchasno = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Помилка при запису url файлу до БД" });
   }
-  
+
 };
 
 const parseFileCSV = async (req, res) => {
