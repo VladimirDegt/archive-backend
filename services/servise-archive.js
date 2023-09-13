@@ -1,5 +1,6 @@
 const Archive = require("../models/archive");
 const HttpError = require("../utils/http-error");
+const { addNameCustomerToDB } = require("./servise-multi-data-store");
 
 const findIdDocument = async (id) => {
   const find = await Archive.findOne({idDocument: id })
@@ -16,6 +17,7 @@ const getAllFiles = async (sort, skip, limit) => {
 };
 
 const writeDocumentToArchive = async ({ data }, owner) => {
+  const nameCustomer = []
   const updateArrayDocuments = data.map((document) => {
     const tempFullDocument = {};
     if(!document["Посилання на документ"]){
@@ -33,6 +35,7 @@ const writeDocumentToArchive = async ({ data }, owner) => {
     tempFullDocument.numberDocument = document["Номер документа"];
     tempFullDocument.emailCustomer = document["Email контрагента"];
     tempFullDocument.nameCustomer = document["Назва компанії контрагента"];
+    nameCustomer.push(document["Назва компанії контрагента"]);
     tempFullDocument.codeCustomer = document["ЄДРПОУ/ІПН контрагента"];
     tempFullDocument.fileURLPDF = '';
     tempFullDocument.fileURLZIP = '';
@@ -60,6 +63,8 @@ const writeDocumentToArchive = async ({ data }, owner) => {
       throw HttpError(400);
     }
   }
+  addNameCustomerToDB(nameCustomer);
+
 };
 
 const addFileURLToDB = async (id, urls) => {
