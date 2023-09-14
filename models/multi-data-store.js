@@ -6,6 +6,9 @@ const multiDataStore  = new Schema(
     customer: {
       type: [String],
     },
+    numberDogovir: {
+      type: [Number],
+    },
     owner: {
       type: Schema.Types.ObjectId,
       ref: "user",

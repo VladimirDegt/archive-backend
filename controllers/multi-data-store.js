@@ -6,7 +6,7 @@ const allNameCustomer = async (req, res) => {
   const getNamesCustomer = await getNameCustomerToDB();
 
   if (getNamesCustomer) {
-    res.json({getNamesCustomer});
+    res.json(getNamesCustomer);
     return;
   }
   throw HttpError(404);

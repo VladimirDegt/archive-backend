@@ -1,6 +1,6 @@
 const Archive = require("../models/archive");
 const HttpError = require("../utils/http-error");
-const { addNameCustomerToDB } = require("./servise-multi-data-store");
+const { addNameCustomerToDB, addNumberToDB } = require("./servise-multi-data-store");
 
 const findIdDocument = async (id) => {
   const find = await Archive.findOne({idDocument: id })
@@ -9,6 +9,15 @@ const findIdDocument = async (id) => {
 
 const findDocumentOneCustomer = async (name) => {
   const find = await Archive.find({nameCustomer: name})
+  return find;
+}
+
+const findDogovirByNumber= async (number) => {
+  const find = await Archive.find({
+    $and: [
+    { typeDocument: 'Договір' },
+    { numberDogovir: Number(number) }
+  ]})
   return find;
 }
 
@@ -92,6 +101,8 @@ const addNumberDogovirToDB = async ({numberDogovir, numberDogovirForAct}, id) =>
       {idDocument: id},
       { numberDogovir }
     );
+
+    await addNumberToDB(numberDogovir)
   
     if (!addNumbers) {
       throw HttpError(400);
@@ -103,6 +114,8 @@ const addNumberDogovirToDB = async ({numberDogovir, numberDogovirForAct}, id) =>
       {idDocument: id},
       { numberDogovir: numberDogovirForAct },
     );
+
+    await addNumberToDB(numberDogovirForAct)
   
     if (!addNumbers) {
       throw HttpError(400);
@@ -123,4 +136,5 @@ module.exports = {
   totalDocument,
   findDocumentOneCustomer,
   addNumberDogovirToDB,
+  findDogovirByNumber,
 };
