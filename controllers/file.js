@@ -141,7 +141,9 @@ const uploadFileFromVchasno = async (req, res) => {
   }
   try {
     await addFileURLToDB(id, urlFiles);
-    res.json({ message: "Url файлів додано до БД" });
+    res.json({ 
+      urlPdf: urlFiles.urlPdf,
+     });
   } catch (error) {
     res.status(500).json({ message: "Помилка при запису url файлу до БД" });
   }

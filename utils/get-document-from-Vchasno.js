@@ -1,14 +1,15 @@
 const https = require("https");
 const fs = require("fs");
 const HttpError = require("./http-error");
+const parseDogovir = require("./parse-dogovir");
 
 const getDocumentFromVchasno = async (id, typeDocument, resultUpload) => {
-  // const fileUrl = `https://edo.vchasno.ua/api/v2/documents/${id}/${typeDocument}`;
+  const fileUrl = `https://edo.vchasno.ua/api/v2/documents/${id}/${typeDocument}`;
 
-  // const headers = {
-  //   Authorization: "PAuyukh9lEZ0cKr5b4I8t7DU2QRa2Y5hSm-x",
-  //   "Content-Type": "application/json",
-  // };
+  const headers = {
+    Authorization: "PAuyukh9lEZ0cKr5b4I8t7DU2QRa2Y5hSm-x",
+    "Content-Type": "application/json",
+  };
 
   const options = {
     headers: headers,
@@ -25,11 +26,18 @@ const getDocumentFromVchasno = async (id, typeDocument, resultUpload) => {
       }
       const fileStream = fs.createWriteStream(resultUpload);
 
-      response.pipe(fileStream);
-
       fileStream.on("finish", () => {
         fileStream.close();
+        console.log('Файл успішно завантажено до архіву');
+
+        if(typeDocument === "pdf/print") {
+          const normalizedPath = resultUpload.replace(/\\/g, '\\\\');
+          parseDogovir(normalizedPath, id);
+        }
       });
+
+      response.pipe(fileStream);
+      
     })
     .on("error", (err) => {
       console.error("Помилка при запиті на получення файлу:", err);

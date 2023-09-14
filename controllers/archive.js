@@ -2,7 +2,6 @@ const HttpError = require("../utils/http-error");
 const ctrlWrapper = require("../utils/ctrl-wrapper");
 const { getAllFiles, totalDocument, findDocumentOneCustomer} = require("../services/servise-archive");
 
-
 const allDocument = async (req, res) => {
   const { page, limit  } = req.query;
   const skip = (page - 1) * limit;
@@ -32,5 +31,4 @@ const allDocumentOneCustomer = async (req, res) => {
 module.exports = {
   allDocument: ctrlWrapper(allDocument),
   allDocumentOneCustomer: ctrlWrapper(allDocumentOneCustomer),
-
 };

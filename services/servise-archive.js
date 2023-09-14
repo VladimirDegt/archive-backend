@@ -24,7 +24,7 @@ const getAllFiles = async (sort, skip, limit) => {
 const writeDocumentToArchive = async ({ data }, owner) => {
   const nameCustomer = []
   const updateArrayDocuments = data.map((document) => {
-    const tempFullDocument = {};
+    const tempFullDocument = {numberDogovir: ''};
     if(!document["Посилання на документ"]){
       return null;
     }
@@ -86,6 +86,31 @@ const addFileURLToDB = async (id, urls) => {
   return updateFileURL;
 };
 
+const addNumberDogovirToDB = async ({numberDogovir, numberDogovirForAct}, id) => {
+  if(numberDogovir) {
+    const addNumbers = await Archive.findOneAndUpdate(
+      {idDocument: id},
+      { numberDogovir }
+    );
+  
+    if (!addNumbers) {
+      throw HttpError(400);
+    }
+  }
+
+  if(numberDogovirForAct) {
+    const addNumbers = await Archive.findOneAndUpdate(
+      {idDocument: id},
+      { numberDogovir: numberDogovirForAct },
+    );
+  
+    if (!addNumbers) {
+      throw HttpError(400);
+    }
+  }
+};
+
+
 const totalDocument = async() => {
   const total = await Archive.find()
   return total.length
@@ -97,4 +122,5 @@ module.exports = {
   addFileURLToDB,
   totalDocument,
   findDocumentOneCustomer,
+  addNumberDogovirToDB,
 };

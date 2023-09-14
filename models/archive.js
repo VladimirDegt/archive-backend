@@ -33,6 +33,9 @@ const archiveSchema = new Schema(
     fileURLZIP: {
       type: String,
     },
+    numberDogovir: {
+      type: Number,
+    },
     owner: {
       type: Schema.Types.ObjectId,
       ref: "user",
