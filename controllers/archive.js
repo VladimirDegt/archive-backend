@@ -1,6 +1,6 @@
 const HttpError = require("../utils/http-error");
 const ctrlWrapper = require("../utils/ctrl-wrapper");
-const { getAllFiles, totalDocument, findDocumentOneCustomer, findDogovirByNumber} = require("../services/servise-archive");
+const { getAllFiles, totalDocument, findDocumentOneCustomer, findDogovirByNumber, findActByNumber, countDocumentByType} = require("../services/servise-archive");
 
 const allDocument = async (req, res) => {
   const { page, limit  } = req.query;
@@ -38,8 +38,29 @@ const findDogovir = async (req, res) => {
   HttpError(404);
 }
 
+const findAct = async (req, res) => {
+  const {number} = req.params;
+  const result = await findActByNumber(number)
+  if(result) {
+    res.json(result);
+    return;
+  }
+  HttpError(404);
+}
+
+const getAnalitics = async ( req, res) => {
+  const result = await countDocumentByType();
+  if(result) {
+    res.json(result);
+    return;
+  }
+  HttpError(404);
+}
+
 module.exports = {
   allDocument: ctrlWrapper(allDocument),
   allDocumentOneCustomer: ctrlWrapper(allDocumentOneCustomer),
-  findDogovir: ctrlWrapper(findDogovir)
+  findDogovir: ctrlWrapper(findDogovir),
+  findAct: ctrlWrapper(findAct),
+  getAnalitics: ctrlWrapper(getAnalitics),
 };

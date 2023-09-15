@@ -20,6 +20,14 @@ const findDogovirByNumber= async (number) => {
   ]})
   return find;
 }
+const findActByNumber = async (number) => {
+  const find = await Archive.find({
+    $and: [
+    { typeDocument: 'Акт наданих послуг' },
+    { numberDogovir: Number(number) }
+  ]})
+  return find;
+}
 
 const getAllFiles = async (sort, skip, limit) => {
   const getFiles = await Archive.find()
@@ -129,6 +137,23 @@ const totalDocument = async() => {
   return total.length
 }
 
+const countDocumentByType = async () => {
+  const result = await Archive.aggregate([
+    {
+      $group: {
+        _id: "$typeDocument",
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $sort: {
+        count: -1 
+      }
+    }
+  ]);
+  return result;
+};
+
 module.exports = {
   writeDocumentToArchive,
   getAllFiles,
@@ -137,4 +162,6 @@ module.exports = {
   findDocumentOneCustomer,
   addNumberDogovirToDB,
   findDogovirByNumber,
+  findActByNumber,
+  countDocumentByType,
 };

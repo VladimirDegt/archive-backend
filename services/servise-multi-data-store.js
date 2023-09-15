@@ -22,7 +22,6 @@ const addNameCustomerToDB = async (nameCustomer) => {
 };
 
 const addNumberToDB = async (number) => {
-  console.log("number-->", number);
   try {
     const multiDataStore = await MultiDataStore.findOne({});
     if (!multiDataStore) {
@@ -44,14 +43,15 @@ const addNumberToDB = async (number) => {
 };
 
 const getNameCustomerToDB = async () => {
+
   try {
     const getNames = await MultiDataStore.findOne({
       customer: { $exists: true },
     });
     console.log("Назви замовників та номерів успішно знайдено");
     return ({
-      allNames: getNames.customer,
-      allNumbers: getNames.numberDogovir,
+      allNames: getNames.customer.sort(),
+      allNumbers: getNames.numberDogovir.sort(),
     });
   } catch (error) {
     console.log("Помилка узяти всіх замовників: ", error.message);

@@ -12,4 +12,8 @@ router.route("/customer/:name").post(authenticate, ctrl.allDocumentOneCustomer)
 
 router.route("/customer/dogovir/:number").post(authenticate, ctrl.findDogovir)
 
+router.route("/customer/act/:number").post(authenticate, ctrl.findAct)
+
+router.route("/analytics").post(authenticate, ctrl.getAnalitics)
+
 module.exports = router;
