@@ -1,51 +1,9 @@
-// const fs = require("fs");
 const fs = require("fs").promises;
+const { parse } = require("date-fns");
+const ukLocale = require("date-fns/locale/uk");
+const { utcToZonedTime } = require("date-fns-tz");
 const pdfParse = require("pdf-parse");
 const { addNumberDogovirToDB } = require("../services/servise-archive");
-const HttpError = require("./http-error");
-
-// const parseDogovir = async (tempUploadPDF, id) => {
-
-//   await fs.readFile(tempUploadPDF, (err, data) => {
-//     if (err) {
-//       console.log('error-->', err.message)
-//       return
-//     }
-//     pdfParse(data)
-//     .then(function (parseData) {
-//       const afterParsePDF = {};
-//       const textPDF = parseData.text.trim();
-
-//       const regexNumber = /ДОГОВІР No (\d+)/;
-//       const matchNumber = textPDF.match(regexNumber);
-//       if (matchNumber) {
-//         const value = matchNumber[1];
-//         afterParsePDF['numberDogovir'] = Number(value);
-//       }  else {
-//         afterParsePDF['numberDogovir'] = '';
-//       }
-      
-//       const regexNumberForAct = /\(договір  No (\d+) від/;
-//       const matchForAct = textPDF.match(regexNumberForAct);
-//       if (matchForAct) {
-//         const value = matchForAct[1];
-//         afterParsePDF['numberDogovirForAct'] = Number(value);
-//       } else {
-//         afterParsePDF['numberDogovirForAct'] = ''; 
-//       }
-//       console.log('Парсінг .pdf файлу успішно завершено')
-
-//       try {
-//         addNumberDogovirToDB(afterParsePDF, id)
-//       } catch (error) {
-//         console.log('Помилка при додаванні номеру договору до БД-->', error.message);
-//       }
-
-//     })
-//     .catch(error => {
-//       console.log('Помилка при парсінгу файлу pdf', error.message);
-//     });
-// })}
 
 const parseDogovir = async (tempUploadPDF, id) => {
   try {
@@ -58,24 +16,65 @@ const parseDogovir = async (tempUploadPDF, id) => {
     const matchNumber = textPDF.match(regexNumber);
     if (matchNumber) {
       const value = matchNumber[1];
-      afterParsePDF['numberDogovir'] = Number(value);
+      afterParsePDF["numberDogovir"] = Number(value);
     } else {
-      afterParsePDF['numberDogovir'] = '';
+      afterParsePDF["numberDogovir"] = "";
+    }
+
+    const regexDateDogovir = /Цей договір набирає чинності з (.+?) р. та діє /;
+    const matchDateDogovir = textPDF.match(regexDateDogovir);
+    if (matchDateDogovir) {
+      const value = matchDateDogovir[1];
+      const date = parse(value, "dd MMMM yyyy", new Date(), {
+        locale: ukLocale,
+      });
+      const targetTimeZone = "Europe/Kiev";
+      const zonedDate = utcToZonedTime(date, targetTimeZone, {
+        locale: ukLocale,
+      });
+      zonedDate.setMinutes(
+        zonedDate.getMinutes() - zonedDate.getTimezoneOffset()
+      );
+      afterParsePDF["dateDogovir"] = zonedDate;
+    } else {
+      afterParsePDF["dateDogovir"] = "";
     }
 
     const regexNumberForAct = /\(договір  No (\d+) від/;
     const matchForAct = textPDF.match(regexNumberForAct);
     if (matchForAct) {
       const value = matchForAct[1];
-      afterParsePDF['numberDogovirForAct'] = Number(value);
+      afterParsePDF["numberDogovirForAct"] = Number(value);
     } else {
-      afterParsePDF['numberDogovirForAct'] = '';
+      afterParsePDF["numberDogovirForAct"] = "";
     }
-    console.log('Парсінг .pdf файлу успішно завершено');
+
+    const regexDateAct = /від (.+)/;
+    const matchDateAct = textPDF.match(regexDateAct);
+    if (matchDateAct) {
+      const value = matchDateAct[1];
+      console.log("matchDateAct-->", matchDateAct[1]);
+      const date = parse(value, "dd MMMM yyyy", new Date(), {
+        locale: ukLocale,
+      });
+      const targetTimeZone = "Europe/Kiev";
+      const zonedDate = utcToZonedTime(date, targetTimeZone, {
+        locale: ukLocale,
+      });
+      zonedDate.setMinutes(
+        zonedDate.getMinutes() - zonedDate.getTimezoneOffset()
+      );
+      afterParsePDF["dateAct"] = zonedDate;
+    } else {
+      afterParsePDF["dateAct"] = "";
+    }
+
+    console.log("afterParsePDF-->", afterParsePDF);
+    console.log("Парсінг .pdf файлу успішно завершено");
 
     await addNumberDogovirToDB(afterParsePDF, id);
   } catch (error) {
-    console.log('Ошибка:', error.message);
+    console.log("Ошибка:", error.message);
   }
 };
 

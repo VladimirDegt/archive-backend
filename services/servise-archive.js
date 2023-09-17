@@ -1,33 +1,35 @@
 const Archive = require("../models/archive");
 const HttpError = require("../utils/http-error");
-const { addNameCustomerToDB, addNumberToDB } = require("./servise-multi-data-store");
+const {
+  addNameCustomerToDB,
+  addNumberToDB,
+} = require("./servise-multi-data-store");
 
 const findIdDocument = async (id) => {
-  const find = await Archive.findOne({idDocument: id })
+  const find = await Archive.findOne({ idDocument: id });
   return find;
-}
+};
 
 const findDocumentOneCustomer = async (name) => {
-  const find = await Archive.find({nameCustomer: name})
+  const find = await Archive.find({ nameCustomer: name });
   return find;
-}
+};
 
-const findDogovirByNumber= async (number) => {
+const findDogovirByNumber = async (number) => {
   const find = await Archive.find({
-    $and: [
-    { typeDocument: 'Договір' },
-    { numberDogovir: Number(number) }
-  ]})
+    $and: [{ typeDocument: "Договір" }, { numberDogovir: Number(number) }],
+  });
   return find;
-}
+};
 const findActByNumber = async (number) => {
   const find = await Archive.find({
     $and: [
-    { typeDocument: 'Акт наданих послуг' },
-    { numberDogovir: Number(number) }
-  ]})
+      { typeDocument: "Акт наданих послуг" },
+      { numberDogovir: Number(number) },
+    ],
+  });
   return find;
-}
+};
 
 const getAllFiles = async (sort, skip, limit) => {
   const getFiles = await Archive.find()
@@ -39,13 +41,13 @@ const getAllFiles = async (sort, skip, limit) => {
 };
 
 const writeDocumentToArchive = async ({ data }, owner) => {
-  const nameCustomer = []
+  const nameCustomer = [];
   const updateArrayDocuments = data.map((document) => {
-    const tempFullDocument = {numberDogovir: ''};
-    if(!document["Посилання на документ"]){
+    const tempFullDocument = { numberDogovir: "" };
+    if (!document["Посилання на документ"]) {
       return null;
     }
-    if(document["Статус підписання"] !== 'Підписаний всіма'){
+    if (document["Статус підписання"] !== "Підписаний всіма") {
       return null;
     }
     const parts = document["Посилання на документ"].split("/");
@@ -59,19 +61,19 @@ const writeDocumentToArchive = async ({ data }, owner) => {
     tempFullDocument.nameCustomer = document["Назва компанії контрагента"];
     nameCustomer.push(document["Назва компанії контрагента"]);
     tempFullDocument.codeCustomer = document["ЄДРПОУ/ІПН контрагента"];
-    tempFullDocument.fileURLPDF = '';
-    tempFullDocument.fileURLZIP = '';
+    tempFullDocument.fileURLPDF = "";
+    tempFullDocument.fileURLZIP = "";
     tempFullDocument.owner = owner;
     return tempFullDocument;
   });
-  
+
   for (const document of updateArrayDocuments) {
-    if(!document){
-      continue
+    if (!document) {
+      continue;
     }
     const findID = await findIdDocument(document.idDocument);
-    if(findID) {
-      continue
+    if (findID) {
+      continue;
     }
     try {
       await Archive.create(document);
@@ -86,12 +88,11 @@ const writeDocumentToArchive = async ({ data }, owner) => {
     }
   }
   addNameCustomerToDB(nameCustomer);
-
 };
 
 const addFileURLToDB = async (id, urls) => {
   const updateFileURL = await Archive.findOneAndUpdate(
-    {idDocument: id},
+    { idDocument: id },
     { $set: { fileURLPDF: urls.urlPdf, fileURLZIP: urls.urlZip } },
     { new: true }
   );
@@ -103,39 +104,51 @@ const addFileURLToDB = async (id, urls) => {
   return updateFileURL;
 };
 
-const addNumberDogovirToDB = async ({numberDogovir, numberDogovirForAct}, id) => {
-  if(numberDogovir) {
+const addNumberDogovirToDB = async (
+  { numberDogovir, numberDogovirForAct, dateDogovir, dateAct },
+  id
+) => {
+  if (numberDogovir) {
     const addNumbers = await Archive.findOneAndUpdate(
-      {idDocument: id},
-      { numberDogovir }
+      { idDocument: id },
+      { numberDogovir, contractStartDate: dateDogovir }
     );
 
-    await addNumberToDB(numberDogovir)
-  
+    await addNumberToDB(numberDogovir);
+
     if (!addNumbers) {
       throw HttpError(400);
     }
   }
 
-  if(numberDogovirForAct) {
+  if (numberDogovirForAct) {
     const addNumbers = await Archive.findOneAndUpdate(
-      {idDocument: id},
-      { numberDogovir: numberDogovirForAct },
+      { idDocument: id },
+      { numberDogovir: numberDogovirForAct, contractStartDate: dateAct }
     );
 
-    await addNumberToDB(numberDogovirForAct)
-  
+    await addNumberToDB(numberDogovirForAct);
+
     if (!addNumbers) {
+      throw HttpError(400);
+    }
+  }
+  if (!numberDogovirForAct && !numberDogovir && dateAct) {
+    const addDate = await Archive.findOneAndUpdate(
+      { idDocument: id },
+      { contractStartDate: dateAct }
+    );
+
+    if (!addDate) {
       throw HttpError(400);
     }
   }
 };
 
-
-const totalDocument = async() => {
-  const total = await Archive.find()
-  return total.length
-}
+const totalDocument = async () => {
+  const total = await Archive.find();
+  return total.length;
+};
 
 const countDocumentByType = async () => {
   const result = await Archive.aggregate([
@@ -147,9 +160,9 @@ const countDocumentByType = async () => {
     },
     {
       $sort: {
-        count: -1 
-      }
-    }
+        count: -1,
+      },
+    },
   ]);
   return result;
 };

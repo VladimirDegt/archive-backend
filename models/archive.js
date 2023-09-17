@@ -36,6 +36,9 @@ const archiveSchema = new Schema(
     numberDogovir: {
       type: Number,
     },
+    contractStartDate: {
+      type: Schema.Types.Mixed,
+    },
     owner: {
       type: Schema.Types.ObjectId,
       ref: "user",
