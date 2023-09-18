@@ -69,7 +69,6 @@ const parseDogovir = async (tempUploadPDF, id) => {
       afterParsePDF["dateAct"] = "";
     }
 
-    console.log("afterParsePDF-->", afterParsePDF);
     console.log("Парсінг .pdf файлу успішно завершено");
 
     await addNumberDogovirToDB(afterParsePDF, id);
