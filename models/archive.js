@@ -39,6 +39,9 @@ const archiveSchema = new Schema(
     contractStartDate: {
       type: Schema.Types.Mixed,
     },
+    numberRachunok: {
+      type: String,
+    },
     owner: {
       type: Schema.Types.ObjectId,
       ref: "user",

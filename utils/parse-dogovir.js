@@ -40,7 +40,7 @@ const parseDogovir = async (tempUploadPDF, id) => {
       afterParsePDF["dateDogovir"] = "";
     }
 
-    const regexNumberForAct = /\(договір  No (\d+) від/;
+    const regexNumberForAct = /\(договір  No (\d+)\s+від/;
     const matchForAct = textPDF.match(regexNumberForAct);
     if (matchForAct) {
       const value = matchForAct[1];
@@ -53,7 +53,6 @@ const parseDogovir = async (tempUploadPDF, id) => {
     const matchDateAct = textPDF.match(regexDateAct);
     if (matchDateAct) {
       const value = matchDateAct[1];
-      console.log("matchDateAct-->", matchDateAct[1]);
       const date = parse(value, "dd MMMM yyyy", new Date(), {
         locale: ukLocale,
       });
@@ -69,6 +68,15 @@ const parseDogovir = async (tempUploadPDF, id) => {
       afterParsePDF["dateAct"] = "";
     }
 
+    const regexNumberForRachunok = /\(Рахунок\s+No\s+(.*)\s+від/;
+    const matchForRachunok= textPDF.match(regexNumberForRachunok);
+    if (matchForRachunok) {
+      const value = matchForRachunok[1];
+      afterParsePDF["numberRachunok"] = value.trim();
+    } else {
+      afterParsePDF["numberRachunok"] = "";
+    }
+   
     console.log("Парсінг .pdf файлу успішно завершено");
 
     await addNumberDogovirToDB(afterParsePDF, id);

@@ -5,7 +5,7 @@ const { getAllFiles, totalDocument, findDocumentOneCustomer, findDogovirByNumber
 const allDocument = async (req, res) => {
   const { page, limit  } = req.query;
   const skip = (page - 1) * limit;
-  const getFiles = await getAllFiles({ nameCustomer: 1 }, skip, limit);
+  const getFiles = await getAllFiles({ fileURLPDF: 1 }, skip, limit);
   const total = await totalDocument();
 
   if (getFiles) {
