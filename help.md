@@ -93,3 +93,6 @@
 - ім'я файлу робимо унікальним
 - переміщуємо файл
 - записуємо новий шлях у БД
+
+
+DB_HOST = mongodb+srv://Vladimir:Vladimir1@cluster0.4wndn1s.mongodb.net/archive?retryWrites=true&w=majority
