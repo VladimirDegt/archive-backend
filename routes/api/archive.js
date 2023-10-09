@@ -16,4 +16,6 @@ router.route("/customer/act/:number").post(authenticate, ctrl.findAct)
 
 router.route("/analytics").post(authenticate, ctrl.getAnalitics)
 
+router.route("/rangeDate").post(authenticate, ctrl.getDocumentByDate)
+
 module.exports = router;

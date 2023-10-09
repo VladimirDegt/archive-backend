@@ -1,6 +1,6 @@
 const HttpError = require("../utils/http-error");
 const ctrlWrapper = require("../utils/ctrl-wrapper");
-const { getAllFiles, totalDocument, findDocumentOneCustomer, findDogovirByNumber, findActByNumber, countDocumentByType} = require("../services/servise-archive");
+const { getAllFiles, totalDocument, findDocumentOneCustomer, findDogovirByNumber, findActByNumber, countDocumentByType, documentsByRangeDate} = require("../services/servise-archive");
 
 const allDocument = async (req, res) => {
   const { page, limit  } = req.query;
@@ -57,10 +57,21 @@ const getAnalitics = async ( req, res) => {
   HttpError(404);
 }
 
+const getDocumentByDate = async ( req, res) => {
+  const {startDate, endDate} = req.body;
+  const result = await documentsByRangeDate(startDate, endDate);
+  if(result) {
+    res.json(result);
+    return;
+  }
+  HttpError(404);
+}
+
 module.exports = {
   allDocument: ctrlWrapper(allDocument),
   allDocumentOneCustomer: ctrlWrapper(allDocumentOneCustomer),
   findDogovir: ctrlWrapper(findDogovir),
   findAct: ctrlWrapper(findAct),
   getAnalitics: ctrlWrapper(getAnalitics),
+  getDocumentByDate: ctrlWrapper(getDocumentByDate),
 };

@@ -1,5 +1,7 @@
 const Archive = require("../models/archive");
 const HttpError = require("../utils/http-error");
+const ukLocale = require("date-fns/locale/uk");
+const { utcToZonedTime } = require("date-fns-tz");
 const {
   addNameCustomerToDB,
   addNumberToDB,
@@ -179,6 +181,36 @@ const countDocumentByType = async () => {
   return result;
 };
 
+const documentsByRangeDate = async (startDate, endDate) => {
+
+  start = new Date(startDate);
+  end = new Date(endDate);
+
+  const targetTimeZone = "Europe/Kiev";
+
+  const zonedStartDate = utcToZonedTime(start, targetTimeZone, {
+    locale: ukLocale,
+  });
+  zonedStartDate.setMinutes(
+    zonedStartDate.getMinutes() - zonedStartDate.getTimezoneOffset()
+  );
+
+  const zonedEndDate = utcToZonedTime(end, targetTimeZone, {
+    locale: ukLocale,
+  });
+  zonedEndDate.setMinutes(
+    zonedEndDate.getMinutes() - zonedEndDate.getTimezoneOffset()
+  );
+
+  const result = await Archive.find({
+    contractStartDate: {
+      $gte: zonedStartDate,
+      $lte: zonedEndDate
+    }
+  })
+  return result;
+}
+
 module.exports = {
   writeDocumentToArchive,
   getAllFiles,
@@ -189,4 +221,5 @@ module.exports = {
   findDogovirByNumber,
   findActByNumber,
   countDocumentByType,
+  documentsByRangeDate,
 };
