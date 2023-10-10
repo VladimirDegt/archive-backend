@@ -42,6 +42,9 @@ const archiveSchema = new Schema(
     numberRachunok: {
       type: String,
     },
+    dateSigning: {
+      type: String,
+    },
     owner: {
       type: Schema.Types.ObjectId,
       ref: "user",

@@ -76,7 +76,35 @@ const parseDogovir = async (tempUploadPDF, id) => {
     } else {
       afterParsePDF["numberRachunok"] = "";
     }
-   
+
+    const regexDateSigning = /Час перевірки.+(\d{2}.\d{2}.\d{4})/;
+    const lines = textPDF.split('\n');
+    let lastMatch = null;
+
+    for (const line of lines) {
+      const match = regexDateSigning.exec(line);
+      if (match) {
+        lastMatch = match;
+      }
+    }
+
+    if (lastMatch) {
+       const value = lastMatch[1];
+       const date = parse(value, "dd.MM.yyyy", new Date(), {
+        locale: ukLocale,
+      });
+      const targetTimeZone = "Europe/Kiev";
+      const zonedDate = utcToZonedTime(date, targetTimeZone, {
+        locale: ukLocale,
+      });
+      zonedDate.setMinutes(
+        zonedDate.getMinutes() - zonedDate.getTimezoneOffset()
+      );
+       afterParsePDF["dateSigning"] = zonedDate.toISOString();
+    } else {
+       afterParsePDF["dateSigning"] = "";
+    }
+
     console.log("Парсінг .pdf файлу успішно завершено");
 
     await addNumberDogovirToDB(afterParsePDF, id);

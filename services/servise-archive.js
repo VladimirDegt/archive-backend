@@ -107,7 +107,7 @@ const addFileURLToDB = async (id, urls) => {
 };
 
 const addNumberDogovirToDB = async (
-  { numberDogovir, numberDogovirForAct, dateDogovir, dateAct, numberRachunok },
+  { numberDogovir, numberDogovirForAct, dateDogovir, dateAct, numberRachunok, dateSigning },
   id
 ) => {
   if (numberDogovir) {
@@ -154,6 +154,16 @@ const addNumberDogovirToDB = async (
     );
 
     if (!addNumber) {
+      throw HttpError(400);
+    }
+  }
+  if (dateSigning) {
+    const addDateSigning = await Archive.findOneAndUpdate(
+      { idDocument: id },
+      { dateSigning }
+    );
+
+    if (!addDateSigning) {
       throw HttpError(400);
     }
   }
