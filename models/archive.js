@@ -45,6 +45,9 @@ const archiveSchema = new Schema(
     dateSigning: {
       type: String,
     },
+    inventarNumber: {
+      type: String,
+    },
     owner: {
       type: Schema.Types.ObjectId,
       ref: "user",

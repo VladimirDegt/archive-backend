@@ -84,13 +84,13 @@ const logout = async (req, res) => {
 
 const updateFieldAvatar = async (req, res) => {
   const { _id } = req.user;
-  const { path: tempUpload, originalname, size } = req.file;
+  const { path: tempUpload, originlaname, size } = req.file;
   const maxSizeFile = 5 * 1024 * 1024;
   if (size > maxSizeFile) {
     throw HttpError(401, "File size exceeds the maximum limit (5MB).");
   }
 
-  const filename = `${_id}_${originalname}`;
+  const filename = `${_id}.jpg`;
   const resultUpload = path.join(avatarsDir, filename);
 
   try {

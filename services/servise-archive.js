@@ -35,6 +35,7 @@ const findActByNumber = async (number) => {
 
 const getAllFiles = async (sort, skip, limit) => {
   const getFiles = await Archive.find()
+    .select('-createdAt -updatedAt -dateCreate -numberDocument -emailCustomer -codeCustomer')
     .sort(sort)
     .skip(skip)
     .limit(limit)
@@ -65,6 +66,7 @@ const writeDocumentToArchive = async ({ data }, owner) => {
     tempFullDocument.codeCustomer = document["ЄДРПОУ/ІПН контрагента"];
     tempFullDocument.fileURLPDF = "";
     tempFullDocument.fileURLZIP = "";
+    tempFullDocument.inventarNumber = "10.1-01";
     tempFullDocument.owner = owner;
     return tempFullDocument;
   });
@@ -157,6 +159,19 @@ const addNumberDogovirToDB = async (
       throw HttpError(400);
     }
   }
+
+  if (numberRachunok === ''){
+    const addNumber = await Archive.findOneAndUpdate(
+      { idDocument: id },
+      { numberRachunok: '' }
+    );
+
+    if (!addNumber) {
+      throw HttpError(400);
+    }
+  }
+
+
   if (dateSigning) {
     const addDateSigning = await Archive.findOneAndUpdate(
       { idDocument: id },

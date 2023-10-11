@@ -100,7 +100,7 @@ const parseDogovir = async (tempUploadPDF, id) => {
       zonedDate.setMinutes(
         zonedDate.getMinutes() - zonedDate.getTimezoneOffset()
       );
-       afterParsePDF["dateSigning"] = zonedDate.toISOString();
+       afterParsePDF["dateSigning"] = zonedDate;
     } else {
        afterParsePDF["dateSigning"] = "";
     }
