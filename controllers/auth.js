@@ -100,7 +100,6 @@ const updateFieldAvatar = async (req, res) => {
     await fs.rename(tempUpload, resultUpload);
   } catch (error) {
     await fs.unlink(tempUpload);
-    // яку тут помилку викидати? може 500?
     throw HttpError(404);
   }
 

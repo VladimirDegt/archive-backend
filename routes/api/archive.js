@@ -18,4 +18,6 @@ router.route("/analytics").post(authenticate, ctrl.getAnalitics)
 
 router.route("/rangeDate").post(authenticate, ctrl.getDocumentByDate)
 
+router.route("/typeDocument").post(authenticate, ctrl.getDocumentByType)
+
 module.exports = router;

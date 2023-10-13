@@ -160,7 +160,7 @@ const addNumberDogovirToDB = async (
     }
   }
 
-  if (numberRachunok === ''){
+  if (numberRachunok === '') {
     const addNumber = await Archive.findOneAndUpdate(
       { idDocument: id },
       { numberRachunok: '' }
@@ -170,7 +170,6 @@ const addNumberDogovirToDB = async (
       throw HttpError(400);
     }
   }
-
 
   if (dateSigning) {
     const addDateSigning = await Archive.findOneAndUpdate(
@@ -182,6 +181,8 @@ const addNumberDogovirToDB = async (
       throw HttpError(400);
     }
   }
+
+
 };
 
 const totalDocument = async () => {
@@ -236,6 +237,34 @@ const documentsByRangeDate = async (startDate, endDate) => {
   return result;
 }
 
+const documentsByType = async (typeDocument) => {
+  if(typeDocument === "Тип документа не вказано") {
+    const result = await Archive.find({ typeDocument: null })
+    .select(
+      "-createdAt -updatedAt -dateCreate -numberDocument -emailCustomer -codeCustomer"
+    )
+    .sort('dateSigning')
+
+    if (!result) {
+      throw HttpError(400);
+    }
+  
+    return result;
+  }
+  
+  const result = await Archive.find({ typeDocument })
+    .select(
+      "-createdAt -updatedAt -dateCreate -numberDocument -emailCustomer -codeCustomer"
+    )
+    .sort('dateSigning')
+
+  if (!result) {
+    throw HttpError(400);
+  }
+
+  return result;
+};
+
 module.exports = {
   writeDocumentToArchive,
   getAllFiles,
@@ -247,4 +276,5 @@ module.exports = {
   findActByNumber,
   countDocumentByType,
   documentsByRangeDate,
+  documentsByType,
 };
