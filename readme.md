@@ -6,7 +6,7 @@
 
 ##### Servers:
 
-[https://contacts-api-3i4o.onrender.com/api/contacts](https://contacts-api-3i4o.onrender.com/api/contacts)
+[https://contacts-api-3i4o.onrender.com/api/contacts](https://contacts-api-3i4o.onrender.com/api/contacts) (update 16.10.23 - server off)
 
 ### Contacts
 
@@ -39,7 +39,7 @@
 
 ##### Servers:
 
-[https://contacts-api-3i4o.onrender.com/users](https://contacts-api-3i4o.onrender.com/api/contacts)
+[https://contacts-api-3i4o.onrender.com/users](https://contacts-api-3i4o.onrender.com/api/contacts) (update 16.10.23 - server off)
 
 ### Users
 
