@@ -19,6 +19,10 @@ const userSchema = new Schema(
       type: String,
       required: [true, "Set password for user"],
     },
+    status: {
+      type: String,
+      required: [true, "Set status for user"],
+    },
     token: String,
     avatarURL: String,
   },

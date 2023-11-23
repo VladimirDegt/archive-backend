@@ -15,6 +15,10 @@ const registerSchema = Joi.object({
     "any.required": "missing field email",
     "string.pattern": "email not valid",
   }),
+  status: Joi.string().valid('moderator', 'user').required().messages({
+    "any.required": "missing field status",
+    "any.only": "status must be either 'moderator' or 'user'"
+  }),
 });
 
 const loginSchema = Joi.object({
