@@ -2,12 +2,15 @@ const https = require("https");
 const fs = require("fs");
 const HttpError = require("./http-error");
 const parseDogovir = require("./parse-dogovir");
+require("dotenv").config();
 
 const getDocumentFromVchasno = async (id, typeDocument, resultUpload) => {
-  const fileUrl = `https://edo.vchasno.ua/api/v2/documents/${id}/${typeDocument}`;
+    const fileUrl = `https://edo.vchasno.ua/api/v2/documents/${id}/${typeDocument}`;
+    
+    const API_KEY = process.env.API_KEY
 
   const headers = {
-    Authorization: "PAuyukh9lEZ0cKr5b4I8t7DU2QRa2Y5hSm-x",
+    Authorization: API_KEY,
     "Content-Type": "application/json",
   };
 
