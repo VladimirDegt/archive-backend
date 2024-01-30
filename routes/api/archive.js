@@ -20,4 +20,6 @@ router.route("/rangeDate").post(authenticate, ctrl.getDocumentByDate)
 
 router.route("/typeDocument").post(authenticate, ctrl.getDocumentByType)
 
+router.route("/nomenclature").post(authenticate, ctrl.getDocumentByNomenclature)
+
 module.exports = router;

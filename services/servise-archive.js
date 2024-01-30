@@ -265,6 +265,21 @@ const documentsByType = async (typeDocument) => {
   return result;
 };
 
+const documentsByNomenclature = async (nomenclature) => {
+  
+  const result = await Archive.find({ inventarNumber: nomenclature })
+    .select(
+      "-createdAt -updatedAt -dateCreate -numberDocument -emailCustomer -codeCustomer"
+    )
+    .sort('dateSigning')
+
+  if (!result) {
+    throw HttpError(400);
+  }
+
+  return result;
+};
+
 module.exports = {
   writeDocumentToArchive,
   getAllFiles,
@@ -276,5 +291,6 @@ module.exports = {
   findActByNumber,
   countDocumentByType,
   documentsByRangeDate,
-  documentsByType,
+    documentsByType,
+  documentsByNomenclature
 };

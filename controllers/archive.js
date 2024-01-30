@@ -8,7 +8,8 @@ const {
   findActByNumber,
   countDocumentByType,
   documentsByRangeDate,
-  documentsByType,
+    documentsByType,
+  documentsByNomenclature
 } = require("../services/servise-archive");
 
 const allDocument = async (req, res) => {
@@ -86,6 +87,16 @@ const getDocumentByType = async (req, res) => {
   HttpError(404);
 };
 
+const getDocumentByNomenclature = async (req, res) => {
+  const { nomenclature } = req.body;
+  const result = await documentsByNomenclature(nomenclature);
+  if (result) {
+    res.json(result);
+    return;
+  }
+  HttpError(404);
+};
+
 module.exports = {
   allDocument: ctrlWrapper(allDocument),
   allDocumentOneCustomer: ctrlWrapper(allDocumentOneCustomer),
@@ -93,5 +104,6 @@ module.exports = {
   findAct: ctrlWrapper(findAct),
   getAnalitics: ctrlWrapper(getAnalitics),
   getDocumentByDate: ctrlWrapper(getDocumentByDate),
-  getDocumentByType: ctrlWrapper(getDocumentByType),
+    getDocumentByType: ctrlWrapper(getDocumentByType),
+  getDocumentByNomenclature: ctrlWrapper(getDocumentByNomenclature),
 };
