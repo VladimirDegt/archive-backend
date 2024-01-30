@@ -151,8 +151,10 @@ const uploadFileFromVchasno = async (req, res) => {
 };
 
 const parseFileCSV = async (req, res) => {
-  const { id: owner } = req.user;
-  const { path: tempUpload, size } = req.file;
+    const { id: owner } = req.user;
+    const { nomenclature } = req.body;
+    const { path: tempUpload, size } = req.file;
+    
   const maxSizeFile = 5 * 1024 * 1024;
   if (size > maxSizeFile) {
     throw HttpError(401, "File size exceeds the maximum limit (5MB).");
@@ -175,7 +177,7 @@ const parseFileCSV = async (req, res) => {
         dynamicTyping: true,
       });
 
-      await writeDocumentToArchive(parse, owner);
+    await writeDocumentToArchive(parse, owner, nomenclature);
 
       res.json({ message: "Дані файлу .csv успішно додано до БД" });
     } catch (error) {

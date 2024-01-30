@@ -43,7 +43,7 @@ const getAllFiles = async (sort, skip, limit) => {
   return getFiles;
 };
 
-const writeDocumentToArchive = async ({ data }, owner) => {
+const writeDocumentToArchive = async ({ data }, owner, nomenclature) => {
   const nameCustomer = [];
   const updateArrayDocuments = data.map((document) => {
     const tempFullDocument = { numberDogovir: "" };
@@ -66,7 +66,7 @@ const writeDocumentToArchive = async ({ data }, owner) => {
     tempFullDocument.codeCustomer = document["ЄДРПОУ/ІПН контрагента"];
     tempFullDocument.fileURLPDF = "";
     tempFullDocument.fileURLZIP = "";
-    tempFullDocument.inventarNumber = "10.1-01";
+    tempFullDocument.inventarNumber = nomenclature;
     tempFullDocument.owner = owner;
     return tempFullDocument;
   });
