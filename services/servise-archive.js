@@ -280,6 +280,37 @@ const documentsByNomenclature = async (nomenclature) => {
   return result;
 };
 
+const documentSigningByDate = async (startDate, endDate) => {
+
+  start = new Date(startDate);
+  end = new Date(endDate);
+
+  const targetTimeZone = "Europe/Kiev";
+
+  const zonedStartDate = utcToZonedTime(start, targetTimeZone, {
+    locale: ukLocale,
+  });
+  zonedStartDate.setMinutes(
+    zonedStartDate.getMinutes() - zonedStartDate.getTimezoneOffset()
+  );
+
+  const zonedEndDate = utcToZonedTime(end, targetTimeZone, {
+    locale: ukLocale,
+  });
+  zonedEndDate.setMinutes(
+    zonedEndDate.getMinutes() - zonedEndDate.getTimezoneOffset()
+    );
+
+  const result = await Archive.find({
+    dateSigning
+: {
+      $gte: zonedStartDate,
+      $lte: zonedEndDate
+    }
+  })
+  return result;
+}
+
 module.exports = {
   writeDocumentToArchive,
   getAllFiles,
@@ -292,5 +323,6 @@ module.exports = {
   countDocumentByType,
   documentsByRangeDate,
     documentsByType,
-  documentsByNomenclature
+    documentsByNomenclature,
+  documentSigningByDate
 };

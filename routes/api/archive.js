@@ -22,4 +22,6 @@ router.route("/typeDocument").post(authenticate, ctrl.getDocumentByType)
 
 router.route("/nomenclature").post(authenticate, ctrl.getDocumentByNomenclature)
 
+router.route("/dateSigning").post(authenticate, ctrl.getDocumentSigningByDate)
+
 module.exports = router;

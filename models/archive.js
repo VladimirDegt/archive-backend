@@ -43,7 +43,7 @@ const archiveSchema = new Schema(
       type: String,
     },
     dateSigning: {
-      type: String,
+      type: Schema.Types.Mixed,
     },
     inventarNumber: {
       type: String,
