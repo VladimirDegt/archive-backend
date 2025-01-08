@@ -16,7 +16,8 @@ const ctrlWrapper = require("../utils/ctrl-wrapper");
 // const parsePDF = require("../utils/parse-pdf");
 // const parseDogovir = require("../utils/parse-dogovir");
 const getDocumentFromVchasno = require("../utils/get-document-from-Vchasno");
-const {writeDocumentToArchive, addFileURLToDB} = require("../services/servise-archive");
+const {writeDocumentToArchive, addFileURLToDB, writeSimplePDFToArchive} = require("../services/servise-archive");
+const waitForFile = require("../utils/waitForFile");
 
 // // =============== для локального зберігання ===============================================
 // // const fileDir = path.join(__dirname, "../", "public", "files");
@@ -190,6 +191,39 @@ const parseFileCSV = async (req, res) => {
   });
 };
 
+const parseFilePDF = async (req, res) => {
+  const { id: owner } = req.user;
+  const { nomenclature } = req.body;
+  const { path: tempUpload, size } = req.file;
+
+  const maxSizeFile = 5 * 1024 * 1024;
+  if (size > maxSizeFile) {
+    throw HttpError(401, "File size exceeds the maximum limit (5MB).");
+  }
+  const user = await User.findById(owner);
+  if (!user) {
+    throw HttpError(401);
+  }
+
+  // Ожидание записи файла
+  const isFileReady = await waitForFile(tempUpload);
+
+  if (!isFileReady) {
+    throw HttpError(500, "File is not ready for processing.");
+  }
+
+  fs.readFile(tempUpload, "utf8", async (err, data) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: "Помилка читання файлу pdf" });
+    }
+
+    await writeSimplePDFToArchive(req.file, owner, nomenclature);
+
+    res.json({ message: "Файл pdf оброблено" });
+  });
+};
+
 module.exports = {
   // add: ctrlWrapper(add),
   // getAll: ctrlWrapper(getAll),
@@ -197,4 +231,5 @@ module.exports = {
   // searchDocument: ctrlWrapper(searchDocument),
   uploadFileFromVchasno: ctrlWrapper(uploadFileFromVchasno),
   parseFileCSV: ctrlWrapper(parseFileCSV),
+  parseFilePDF: ctrlWrapper(parseFilePDF),
 };

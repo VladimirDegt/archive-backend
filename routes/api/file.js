@@ -26,4 +26,6 @@ router
   .route("/csv")
   .post(authenticate, upload.single("csv"), ctrl.parseFileCSV);
 
+router.route('/pdf').post(authenticate, upload.single("pdf"), ctrl.parseFilePDF);
+
 module.exports = router;

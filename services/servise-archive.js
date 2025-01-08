@@ -1,3 +1,4 @@
+const { v4: uuidv4 } = require('uuid');
 const Archive = require("../models/archive");
 const HttpError = require("../utils/http-error");
 const ukLocale = require("date-fns/locale/uk");
@@ -6,6 +7,8 @@ const {
   addNameCustomerToDB,
   addNumberToDB,
 } = require("./servise-multi-data-store");
+const moveAndParseFile = require("../utils/moveAndParseFile");
+
 
 const findIdDocument = async (id) => {
   const find = await Archive.findOne({ idDocument: id });
@@ -23,6 +26,7 @@ const findDogovirByNumber = async (number) => {
   });
   return find;
 };
+
 const findActByNumber = async (number) => {
   const find = await Archive.find({
     $and: [
@@ -93,6 +97,48 @@ const writeDocumentToArchive = async ({ data }, owner, nomenclature) => {
   }
   addNameCustomerToDB(nameCustomer);
 };
+
+const writeSimplePDFToArchive = async (file, owner, nomenclature) => {
+
+  const { afterParsePDF } = await moveAndParseFile(file);
+
+  console.log('afterParsePDF', afterParsePDF)
+
+  const idDocument = uuidv4();
+
+  const tempFullDocument = { numberDogovir: "" };
+  tempFullDocument.idDocument = idDocument;
+  tempFullDocument.dateCreate = 'Невідома';
+  tempFullDocument.nameDocument = 'Невідома';
+  tempFullDocument.typeDocument = 'Невідома';
+  tempFullDocument.numberDocument = 'Р';
+  tempFullDocument.emailCustomer = 'Невідома';
+  tempFullDocument.nameCustomer = 'Невідома';
+  tempFullDocument.codeCustomer = 'Невідома';
+  tempFullDocument.fileURLPDF = "";
+  tempFullDocument.fileURLZIP = "";
+  tempFullDocument.contractStartDate = 'Невідома';
+  tempFullDocument.numberRachunok = 'Невідома';
+  tempFullDocument.dateSigning = 'Невідома';
+  tempFullDocument.inventarNumber = nomenclature;
+  tempFullDocument.owner = owner;
+
+  const findID = await findIdDocument(tempFullDocument.idDocument);
+  if (findID) {
+    return;
+  }
+  try {
+    await Archive.create( tempFullDocument );
+    console.log(
+        `Успішно створено запис для документу з ID ${tempFullDocument.idDocument}`
+    );
+  } catch (error) {
+    console.error(
+        `Помилка при створені запису для документу з ID ${tempFullDocument.idDocument}: ${error.message}`
+    );
+    throw HttpError(400);
+  }
+}
 
 const addFileURLToDB = async (id, urls) => {
   const updateFileURL = await Archive.findOneAndUpdate(
@@ -322,7 +368,8 @@ module.exports = {
   findActByNumber,
   countDocumentByType,
   documentsByRangeDate,
-    documentsByType,
-    documentsByNomenclature,
-  documentSigningByDate
+  documentsByType,
+  documentsByNomenclature,
+  documentSigningByDate,
+  writeSimplePDFToArchive
 };
