@@ -1,4 +1,3 @@
-const { v4: uuidv4 } = require('uuid');
 const Archive = require("../models/archive");
 const HttpError = require("../utils/http-error");
 const ukLocale = require("date-fns/locale/uk");
@@ -102,24 +101,23 @@ const writeSimplePDFToArchive = async (file, owner, nomenclature) => {
 
   const { afterParsePDF } = await moveAndParseFile(file);
 
-  console.log('afterParsePDF', afterParsePDF)
-
-  const idDocument = uuidv4();
+  if (afterParsePDF.numberDogovirForAct) await addNumberToDB(afterParsePDF.numberDogovirForAct);
 
   const tempFullDocument = { numberDogovir: "" };
-  tempFullDocument.idDocument = idDocument;
-  tempFullDocument.dateCreate = 'Невідома';
-  tempFullDocument.nameDocument = 'Невідома';
-  tempFullDocument.typeDocument = 'Невідома';
+  tempFullDocument.idDocument = afterParsePDF.idDocument;
+  tempFullDocument.dateCreate = 'Невизначено';
+  tempFullDocument.nameDocument = afterParsePDF.nameDocument;
+  tempFullDocument.typeDocument = 'Акт наданих послуг';
+  tempFullDocument.numberDogovir = afterParsePDF.numberDogovirForAct;
   tempFullDocument.numberDocument = 'Р';
-  tempFullDocument.emailCustomer = 'Невідома';
-  tempFullDocument.nameCustomer = 'Невідома';
-  tempFullDocument.codeCustomer = 'Невідома';
-  tempFullDocument.fileURLPDF = "";
-  tempFullDocument.fileURLZIP = "";
-  tempFullDocument.contractStartDate = 'Невідома';
-  tempFullDocument.numberRachunok = 'Невідома';
-  tempFullDocument.dateSigning = 'Невідома';
+  tempFullDocument.emailCustomer = 'Невизначено';
+  tempFullDocument.nameCustomer = 'Невизначено';
+  tempFullDocument.codeCustomer = 'Невизначено';
+  tempFullDocument.fileURLPDF = afterParsePDF.fileURLPDF;
+  tempFullDocument.fileURLZIP = "Невизначено";
+  tempFullDocument.contractStartDate = afterParsePDF.dateAct;
+  tempFullDocument.numberRachunok = afterParsePDF.numberRachunok;
+  tempFullDocument.dateSigning = afterParsePDF.dateSigning;
   tempFullDocument.inventarNumber = nomenclature;
   tempFullDocument.owner = owner;
 

@@ -1,3 +1,4 @@
+const {v4: uuidv4} = require("uuid");
 const fs = require('fs/promises');
 const path = require('path');
 const pdfParse = require('pdf-parse');
@@ -5,13 +6,16 @@ const {parse} = require("date-fns");
 const ukLocale = require("date-fns/locale/uk");
 const {utcToZonedTime} = require("date-fns-tz");
 
+const formatDate = require("./formatDate");
+
 const tempDir = path.join(__dirname, "../", "temp");
 const publicDir = path.join(__dirname, "../", "public", "files");
+const idDocument = uuidv4();
 
 async function moveAndParseFile(file) {
     try {
         const tempFilePath = path.join(tempDir, file.filename);
-        const publicFilePath = path.join(publicDir, file.filename);
+        const publicFilePath = path.join(publicDir, `${idDocument}.pdf`);
 
         // Перемещаем файл из temp в public/file
         await fs.rename(tempFilePath, publicFilePath);
@@ -21,7 +25,11 @@ async function moveAndParseFile(file) {
 
         // Парсим PDF
         const parseData = await pdfParse(data);
-        const afterParsePDF = {};
+        const afterParsePDF = {
+            idDocument,
+            nameDocument: file.filename,
+            fileURLPDF: publicFilePath,
+        };
         const textPDF = parseData.text.trim();
 
         const regexNumberForAct = /\(договір  No (\d+)\s+від/;
