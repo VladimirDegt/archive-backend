@@ -25,10 +25,11 @@ async function moveAndParseFile(file) {
 
         // Парсим PDF
         const parseData = await pdfParse(data);
+        const newFileName = `${idDocument}.pdf`;
         const afterParsePDF = {
             idDocument,
             nameDocument: file.filename,
-            fileURLPDF: publicFilePath,
+            fileURLPDF: path.join("/", "files", "/", newFileName),
         };
         const textPDF = parseData.text.trim();
 
